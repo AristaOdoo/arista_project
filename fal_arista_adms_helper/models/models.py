@@ -6,7 +6,7 @@ import logging
 _logger = logging.getLogger(__name__)
 
 # Model exception
-model_exception = ['res.partner', 'account.tax']
+model_exception = ['account.tax']
 
 
 class BaseModel(models.AbstractModel):
@@ -22,6 +22,7 @@ class BaseModel(models.AbstractModel):
             #    should always be on the same business type
             business_type = False
             business_type_field = model.field_id.sudo().filtered(lambda x: x.relation == 'fal.business.type' and x.ttype == 'many2one' and x.name != 'x_studio_unitowner')
+            company_type_field = model.field_id.sudo().filtered(lambda x: x.relation == 'res.company' and x.ttype == 'many2one')
             if business_type_field:
                 business_type_adms_key = 'x_studio_adms_id_' + business_type_field.name
                 for key in vals:
@@ -38,9 +39,17 @@ class BaseModel(models.AbstractModel):
             # If business type field is present, search by adms_id + business type
             # TO DO: later there is some exception object
             domain = [('x_studio_adms_id', '=', vals['x_studio_adms_id'])]
-            if business_type_field and model.model not in model_exception:
+            # Special case for Partner. Because ADMS split it's partner to customer and vendor
+            # Both table have different approach
+            if model.model in ['res.partner']:
+                # If customer, do not find the business type. Only the company
+                if 'customer_rank' in new_vals and new_vals['customer_rank'] > 0:
+                    domain += [(company_type_field.name, '=', new_vals[company_type_field.name])]
+                else:
+                    domain += [(company_type_field.name, '=', new_vals[company_type_field.name])]
+                    domain += [(business_type_field.name, '=', new_vals[business_type_field.name])]
+            elif business_type_field and model.model not in model_exception:
                 domain += [(business_type_field.name, '=', new_vals[business_type_field.name])]
-                similar_adms_id = self.sudo().search(domain)
             similar_adms_id = self.sudo().search(domain)
             if similar_adms_id:
                 result = similar_adms_id.sudo().write(new_vals)
@@ -118,7 +127,15 @@ class BaseModel(models.AbstractModel):
                     # behavior of company
                     if m2o_model.model == 'res.users':
                         m2o_business_type = m2o_model.field_id.sudo().filtered(lambda x: x.relation == 'fal.business.type' and x.ttype == 'many2one' and x.name == 'fal_business_type')
-                    if business_type and m2o_business_type and m2o_model.model not in model_exception:
+                    # Special case for Partner. Because ADMS split it's partner to customer and vendor
+                    # Both table have different approach
+                    if m2o_model.model in ['res.partner']:
+                        # If customer, do not find the business type. Only the company
+                        if 'customer_rank' in vals and vals['customer_rank'] > 0:
+                            real_id = self.env[field.relation].sudo().search([('x_studio_adms_id', '=', vals[key]), (company_type_field.name, '=', business_type.company_id.id)], limit=1)
+                        else:
+                            real_id = self.env[field.relation].sudo().search([('x_studio_adms_id', '=', vals[key]), (m2o_business_type.name, '=', business_type.id), (company_type_field.name, '=', business_type.company_id.id)], limit=1)
+                    elif business_type and m2o_business_type and m2o_model.model not in model_exception:
                         real_id = self.env[field.relation].sudo().search([('x_studio_adms_id', '=', vals[key]), (m2o_business_type.name, '=', business_type.id)], limit=1)
                     # If the object doesn't have business type
                     else:
