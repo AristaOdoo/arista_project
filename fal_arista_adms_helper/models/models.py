@@ -21,7 +21,7 @@ class BaseModel(models.AbstractModel):
             # 0. Business Type need to be defined here, no matter what, the header and child
             #    should always be on the same business type
             business_type = False
-            business_type_field = model.field_id.sudo().filtered(lambda x: x.relation == 'fal.business.type' and x.ttype == 'many2one' and x.name != 'x_studio_unitowner')
+            business_type_field = model.field_id.sudo().filtered(lambda x: x.relation == 'fal.business.type' and x.ttype == 'many2one' and x.name not in ['x_studio_unitowner', 'x_studio_frombranch', 'x_studio_tobranch'])
             company_type_field = model.field_id.sudo().filtered(lambda x: x.relation == 'res.company' and x.ttype == 'many2one')
             if business_type_field:
                 business_type_adms_key = 'x_studio_adms_id_' + business_type_field.name
@@ -63,7 +63,7 @@ class BaseModel(models.AbstractModel):
         new_vals = {}
         # We want business type to be searched upfront, so whatever the sequence of input
         # There will be no error
-        business_type_field = model.field_id.sudo().filtered(lambda x: x.relation == 'fal.business.type' and x.ttype == 'many2one' and x.name != 'x_studio_unitowner')
+        business_type_field = model.field_id.sudo().filtered(lambda x: x.relation == 'fal.business.type' and x.ttype == 'many2one' and x.name not in ['x_studio_unitowner', 'x_studio_frombranch', 'x_studio_tobranch'])
         if business_type_field:
             business_type_adms_key = 'x_studio_adms_id_' + business_type_field.name
         # Also find the Company field as we want to fill it automatically when we found the business type
@@ -77,7 +77,7 @@ class BaseModel(models.AbstractModel):
                 # Need to change the model to the list field model
                 field = self.env['ir.model.fields'].sudo().search([('model_id', '=', model.id), ('name', '=', key)])
                 model = self.env['ir.model'].sudo().search([('model', '=', field.relation)], limit=1)
-                component_business_type_field = model.field_id.sudo().filtered(lambda x: x.relation == 'fal.business.type' and x.ttype == 'many2one' and x.name != 'x_studio_unitowner')
+                component_business_type_field = model.field_id.sudo().filtered(lambda x: x.relation == 'fal.business.type' and x.ttype == 'many2one' and x.name not in ['x_studio_unitowner', 'x_studio_frombranch', 'x_studio_tobranch'])
                 # One2many component of API call set did not "have" ADMS ID
                 # At first we do not know this, so for work around, we just don't need to
                 # find out if component already have ADMS id, just always unlink all and
@@ -121,7 +121,7 @@ class BaseModel(models.AbstractModel):
                     # If business type is present
                     # also include on our search business type domain
                     m2o_model = self.env['ir.model'].sudo().search([('model', '=', field.relation)])
-                    m2o_business_type = m2o_model.field_id.sudo().filtered(lambda x: x.relation == 'fal.business.type' and x.ttype == 'many2one' and x.name != 'x_studio_unitowner')
+                    m2o_business_type = m2o_model.field_id.sudo().filtered(lambda x: x.relation == 'fal.business.type' and x.ttype == 'many2one' and x.name not in ['x_studio_unitowner', 'x_studio_frombranch', 'x_studio_tobranch'])
                     m2o_company = m2o_model.field_id.sudo().filtered(lambda x: x.relation == 'res.company' and x.ttype == 'many2one')
                     # Special case for res.users object.
                     # It will always have 2 many2one related to business type, because mirror
