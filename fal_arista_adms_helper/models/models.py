@@ -6,7 +6,7 @@ import logging
 _logger = logging.getLogger(__name__)
 
 # Model exception
-model_exception = ['account.tax']
+model_exception = []
 
 
 class BaseModel(models.AbstractModel):
