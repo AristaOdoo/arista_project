@@ -68,4 +68,7 @@ class IrActionsServer(models.Model):
                 return {'issue_journal': real_id.x_studio_issue_entry and real_id.x_studio_issue_entry.name or '',
                         'transfer_journal': real_id.x_studio_transfer_journal and real_id.x_studio_transfer_journal.name or '',
                         'invoice_journal': real_id.invoice_ids[0] and real_id.invoice_ids[0].name or ''}
+            if operation in [586]:
+                return {'issue_journal': real_id.x_studio_issue_entry and real_id.x_studio_issue_entry.name or '',
+                        'invoice_journal': real_id.invoice_ids[0] and real_id.invoice_ids[0].name or ''}
         return 'Share ID & Branch is required'
