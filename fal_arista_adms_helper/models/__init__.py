@@ -1,4 +1,5 @@
 from . import models
+from . import ir_actions
 from . import stock_inventory
 from . import stock_picking
 from . import res_partner
