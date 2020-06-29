@@ -46,20 +46,26 @@ class IrActionsServer(models.Model):
             business_type = self.env['fal.business.type'].sudo().search([('x_studio_adms_id', '=', fal_business_type)], limit=1)
             company = business_type.company_id
             # Real ID
-            real_id = self.env[model.model].search([('x_studio_adms_id', '=', adms_id), (business_type_field.name, '=', business_type.id)])
+            real_id = self.env[model.model].sudo().search([('x_studio_adms_id', '=ilike', adms_id), (business_type_field.name, '=', business_type.id)])
             if not real_id:
-                real_id = self.env[model.model].search([('x_studio_adms_id', '=', adms_id), (company_type_field.name, '=', company.id)])
+                real_id = self.env[model.model].sudo().search([('x_studio_adms_id', '=ilike', adms_id), (company_type_field.name, '=', company.id)])
             # If still not found
             if not real_id:
                 return "Record not found. Model: %s, Business Type Field: %s, Company Field %s, Business Type: %s, Company: %s" % (model.model, business_type_field, company_type_field, business_type, company)
             # Generate Context
             context = {'lang': 'en_US', 'tz': False, 'uid': 2, 'allowed_company_ids': [15, 15, 1, 1, 14, 14, 16, 17, 18, 19, 19], 'active_id': real_id.id, 'active_ids': real_id.ids, 'active_model': model.model, 'mail_notify_force_send': False}
             try:
-                action_server.with_context(context).run()
+                action_server.sudo().with_context(context).run()
             except Exception:
                 return "Failed to run method. Context: %s" % (str(context))
             # Because we can't return value from ir.action.server, we need to manually search it's result on the object.
             # PC Journal
             if operation in [591]:
                 return {'pc_journal': real_id.x_studio_issue_journal.name}
+            if operation in [593]:
+                return {'pc_journal': real_id.x_studio_issue_journal.name}
+            if operation in [587]:
+                return {'issue_journal': real_id.x_studio_issue_entry and real_id.x_studio_issue_entry.name or '',
+                        'transfer_journal': real_id.x_studio_transfer_journal and real_id.x_studio_transfer_journal.name or '',
+                        'invoice_journal': real_id.invoice_ids[0] and real_id.invoice_ids[0].name or ''}
         return 'Share ID & Branch is required'
