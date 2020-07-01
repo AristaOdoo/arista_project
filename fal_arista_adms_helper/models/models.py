@@ -48,6 +48,10 @@ class BaseModel(models.AbstractModel):
                 else:
                     domain += [(company_type_field.name, '=', new_vals[company_type_field.name])]
                     domain += [(business_type_field.name, '=', new_vals[business_type_field.name])]
+            # Special case for x_studio_reason_code, do not find company/business type
+            # Means do nothing
+            elif model.model in ['x_reason_adms']:
+                pass
             elif business_type_field and model.model not in model_exception:
                 domain += [(business_type_field.name, '=', new_vals[business_type_field.name])]
             similar_adms_id = self.sudo().search(domain)
@@ -135,6 +139,8 @@ class BaseModel(models.AbstractModel):
                         real_id = self.env[field.relation].sudo().search([('x_studio_adms_id', '=', vals[key]), (m2o_business_type.name, '=', business_type.id), (m2o_company.name, '=', business_type.company_id.id)], limit=1)
                         if not real_id:
                             real_id = self.env[field.relation].sudo().search([('x_studio_adms_id', '=', vals[key]), (m2o_company.name, '=', business_type.company_id.id)], limit=1)
+                    elif m2o_model.model in ['x_reason_adms']:
+                        real_id = self.env[field.relation].sudo().search([('x_studio_adms_id', '=', vals[key])], limit=1)
                     elif business_type and m2o_business_type and m2o_model.model not in model_exception:
                         real_id = self.env[field.relation].sudo().search([('x_studio_adms_id', '=', vals[key]), (m2o_business_type.name, '=', business_type.id)], limit=1)
                     # If the object doesn't have business type
