@@ -59,7 +59,7 @@ class IrActionsServer(models.Model):
                 real_id = self.env[model.model].sudo().search([('x_studio_adms_id', '=ilike', adms_id), (company_type_field.name, '=', company.id)])
             # If still not found
             if not real_id:
-                result['isSuccess'] = 'False'
+                result['isSuccess'] = False
                 result['ErrorMsg'] = "Record not found. Model: %s, Business Type Field: %s, Company Field %s, Business Type: %s, Company: %s" % (model.model, business_type_field, company_type_field, business_type, company)
                 return result
             # Generate Context
@@ -67,30 +67,30 @@ class IrActionsServer(models.Model):
             try:
                 action_server.sudo().with_context(context).run()
             except Exception:
-                result['isSuccess'] = 'False'
+                result['isSuccess'] = False
                 result['ErrorMsg'] = "Failed to run method. Context: %s" % (str(context))
                 return result
             # Because we can't return value from ir.action.server, we need to manually search it's result on the object.
             # PC Journal
             if operation in [606]:
-                result['isSuccess'] = 'True'
+                result['isSuccess'] = True
                 result['pc_journal'] = real_id.x_studio_issue_journal.name
                 return result
             if operation in [607]:
-                result['isSuccess'] = 'True'
+                result['isSuccess'] = True
                 result['pc_journal'] = real_id.x_studio_issue_journal.name
                 return result
             if operation in [587]:
-                result['isSuccess'] = 'True'
+                result['isSuccess'] = True
                 result['issue_journal'] = real_id.x_studio_issue_entry and real_id.x_studio_issue_entry.name or ''
                 result['transfer_journal'] = real_id.x_studio_transfer_journal and real_id.x_studio_transfer_journal.name or ''
                 result['invoice_journal'] = real_id.invoice_ids[0] and real_id.invoice_ids[0].name or ''
                 return result
             if operation in [586]:
-                result['isSuccess'] = 'True'
+                result['isSuccess'] = True
                 result['issue_journal'] = real_id.x_studio_issue_entry and real_id.x_studio_issue_entry.name or ''
                 result['invoice_journal'] = real_id.invoice_ids[0] and real_id.invoice_ids[0].name or ''
                 return result
-        result['isSuccess'] = 'False'
+        result['isSuccess'] = False
         result['ErrorMsg'] = 'Share ID & Branch is required'
         return result
