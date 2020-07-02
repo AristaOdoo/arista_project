@@ -72,10 +72,10 @@ class IrActionsServer(models.Model):
                 return result
             # Because we can't return value from ir.action.server, we need to manually search it's result on the object.
             # PC Journal
-            if operation in [591]:
+            if operation in [606]:
                 result['pc_journal'] = real_id.x_studio_issue_journal.name
                 return result
-            if operation in [593]:
+            if operation in [607]:
                 result['pc_journal'] = real_id.x_studio_issue_journal.name
                 return result
             if operation in [587]:
