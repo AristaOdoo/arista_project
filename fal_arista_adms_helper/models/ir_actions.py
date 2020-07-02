@@ -36,8 +36,8 @@ class IrActionsServer(models.Model):
     @api.model
     def adms_method(self, operation, adms_id=False, fal_business_type=False):
         result = {
-            'success': True,
-            'error': '',
+            'isSuccess': True,
+            'ErrorMsg': '',
             'pc_journal': '',
             'issue_journal': '',
             'transfer_journal': '',
@@ -59,16 +59,16 @@ class IrActionsServer(models.Model):
                 real_id = self.env[model.model].sudo().search([('x_studio_adms_id', '=ilike', adms_id), (company_type_field.name, '=', company.id)])
             # If still not found
             if not real_id:
-                result['success'] = False,
-                result['error'] = "Record not found. Model: %s, Business Type Field: %s, Company Field %s, Business Type: %s, Company: %s" % (model.model, business_type_field, company_type_field, business_type, company)
+                result['isSuccess'] = False,
+                result['ErrorMsg'] = "Record not found. Model: %s, Business Type Field: %s, Company Field %s, Business Type: %s, Company: %s" % (model.model, business_type_field, company_type_field, business_type, company)
                 return result
             # Generate Context
             context = {'lang': 'en_US', 'tz': False, 'uid': 2, 'allowed_company_ids': [15, 15, 1, 1, 14, 14, 16, 17, 18, 19, 19], 'active_id': real_id.id, 'active_ids': real_id.ids, 'active_model': model.model, 'mail_notify_force_send': False}
             try:
                 action_server.sudo().with_context(context).run()
             except Exception:
-                result['success'] = False,
-                result['error'] = "Failed to run method. Context: %s" % (str(context))
+                result['isSuccess'] = False,
+                result['ErrorMsg'] = "Failed to run method. Context: %s" % (str(context))
                 return result
             # Because we can't return value from ir.action.server, we need to manually search it's result on the object.
             # PC Journal
@@ -87,6 +87,6 @@ class IrActionsServer(models.Model):
                 result['issue_journal'] = real_id.x_studio_issue_entry and real_id.x_studio_issue_entry.name or ''
                 result['invoice_journal'] = real_id.invoice_ids[0] and real_id.invoice_ids[0].name or ''
                 return result
-        result['success'] = False,
-        result['error'] = 'Share ID & Branch is required'
+        result['isSuccess'] = False,
+        result['ErrorMsg'] = 'Share ID & Branch is required'
         return result
