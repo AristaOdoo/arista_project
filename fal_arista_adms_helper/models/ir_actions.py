@@ -86,7 +86,7 @@ class IrActionsServer(models.Model):
                 result['transfer_journal'] = real_id.x_studio_transfer_journal and real_id.x_studio_transfer_journal.name or ''
                 result['invoice_journal'] = real_id.invoice_ids[0] and real_id.invoice_ids[0].name or ''
                 return result
-            if operation in [586]:
+            if operation in [592]:
                 result['isSuccess'] = True
                 result['issue_journal'] = real_id.x_studio_issue_entry and real_id.x_studio_issue_entry.name or ''
                 result['invoice_journal'] = real_id.invoice_ids[0] and real_id.invoice_ids[0].name or ''
