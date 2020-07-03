@@ -56,7 +56,10 @@ class BaseModel(models.AbstractModel):
                 domain += [(business_type_field.name, '=', new_vals[business_type_field.name])]
             similar_adms_id = self.sudo().search(domain)
             if similar_adms_id:
-                result = similar_adms_id.sudo().write(new_vals)
+                # Before writing, make sure that this object method hasn't been called
+                able_overwrite = self.check_method(model, similar_adms_id)
+                if able_overwrite:
+                    result = similar_adms_id.sudo().write(new_vals)
                 return similar_adms_id
             else:
                 result = self.sudo().create(new_vals)
@@ -152,3 +155,21 @@ class BaseModel(models.AbstractModel):
             else:
                 new_vals[key] = vals[key]
         return new_vals
+
+    def check_method(self, model, record):
+        if model.model == 'purchase.order':
+            if record.x_studio_issue_journal:
+                return False
+            else:
+                return True
+        elif model.model == 'x_adms_po_header':
+            if record.x_studio_issue_journal:
+                return False
+            else:
+                return True
+        elif model.model == 'sale.order':
+            if record.x_studio_issue_entry or record.invoice_ids or record.x_studio_transfer_journal:
+                return False
+            else:
+                return True
+        return True
