@@ -80,7 +80,7 @@ class IrActionsServer(models.Model):
                 result['isSuccess'] = True
                 result['pc_journal'] = real_id.x_studio_issue_journal.name
                 return result
-            if operation in [587]:
+            if operation in [605]:
                 result['isSuccess'] = True
                 result['issue_journal'] = real_id.x_studio_issue_entry and real_id.x_studio_issue_entry.name or ''
                 result['transfer_journal'] = real_id.x_studio_transfer_journal and real_id.x_studio_transfer_journal.name or ''
