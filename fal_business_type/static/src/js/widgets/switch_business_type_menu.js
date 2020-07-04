@@ -59,7 +59,7 @@ var SwitchBusinessTypeMenu = Widget.extend({
             if (this.company_business_type_mapping[i][1] === this.current_business_type){
                 if (this.company_business_type_mapping[i][0] !== this.current_company){
                     var new_allowed_company_ids = this.allowed_company_ids
-                    if (new_allowed_company_ids.indexOf(this.company_business_type_mapping[i][0]) !== -1){
+                    if (new_allowed_company_ids.indexOf(this.company_business_type_mapping[i][0]) === -1){
                         new_allowed_company_ids.push(this.company_business_type_mapping[i][0])
                     }
                     session.setBusinessTypes(this.current_business_type, this.allowed_business_type_ids, this.company_business_type_mapping[i][0], new_allowed_company_ids);
@@ -82,6 +82,7 @@ var SwitchBusinessTypeMenu = Widget.extend({
      * So, we need to manage the allowed companies to match selected business type
      */
     _onSwitchBusinessTypeClick: function (ev) {
+        var self = this;
         if (ev.type == 'keydown' && ev.which != $.ui.keyCode.ENTER && ev.which != $.ui.keyCode.SPACE) {
             return;
         }
@@ -122,6 +123,16 @@ var SwitchBusinessTypeMenu = Widget.extend({
                 }
             }
         }
+        // Arista Special Case, If non-consolidation, user only allowed to see 1 business types
+        session.user_has_group('fal_business_type.fal_arista_consolidation_group').then(function(has_group) {
+            if (has_group) {
+                session.setBusinessTypes(companyID, allowed_business_type_ids, current_company_id, current_company_ids);
+            }else{
+                allowed_business_type_ids = [companyID]
+                current_company_ids = [current_company_id]
+                session.setBusinessTypes(companyID, allowed_business_type_ids, current_company_id, current_company_ids);
+            }
+        });
         session.setBusinessTypes(companyID, allowed_business_type_ids, current_company_id, current_company_ids);
     },
 
@@ -137,37 +148,46 @@ var SwitchBusinessTypeMenu = Widget.extend({
      * If we toggle Out, doesn't means we do not want to see the companies, so do nothing
      */
     _onToggleBusinessTypeClick: function (ev) {
-        if (ev.type == 'keydown' && ev.which != $.ui.keyCode.ENTER && ev.which != $.ui.keyCode.SPACE) {
-            return;
-        }
-        ev.preventDefault();
-        ev.stopPropagation();
-        var dropdownItem = $(ev.currentTarget).parent();
-        var companyID = dropdownItem.data('company-id');
-        var allowed_business_type_ids = this.allowed_business_type_ids;
-        var current_business_unit_id = this.current_business_type;
-        var company_business_type_mapping = this.company_business_type_mapping;
-        if (dropdownItem.find('.fa-square-o').length) {
-            allowed_business_type_ids.push(companyID);
-            dropdownItem.find('.fa-square-o').removeClass('fa-square-o').addClass('fa-check-square');
-        } else {
-            if (allowed_business_type_ids.length > 1 && current_business_unit_id != companyID){
-                allowed_business_type_ids.splice(allowed_business_type_ids.indexOf(companyID), 1);
-                dropdownItem.find('.fa-check-square').addClass('fa-square-o').removeClass('fa-check-square');
-            }
-        }
-        // We store current business type / business types
-        // In case of any failure, it goes back to standard value without error
-        var current_company_ids = this.allowed_company_ids
-        var current_company_id = current_company_ids[0];
-        for (var i = 0; i<company_business_type_mapping.length; i++){
-            if (allowed_business_type_ids.indexOf(company_business_type_mapping[i][1]) !== -1){
-                if (current_company_ids.indexOf(company_business_type_mapping[i][0]) === -1){
-                    current_company_ids.push(company_business_type_mapping[i][0])
+        var self = this;
+        // Special Arista Case, If non-consolidation, user can't toggle business type
+        session.user_has_group('fal_business_type.fal_arista_consolidation_group').then(function(has_group) {
+            if (has_group) {
+                if (ev.type == 'keydown' && ev.which != $.ui.keyCode.ENTER && ev.which != $.ui.keyCode.SPACE) {
+                    return;
                 }
+                ev.preventDefault();
+                ev.stopPropagation();
+                var dropdownItem = $(ev.currentTarget).parent();
+                var companyID = dropdownItem.data('company-id');
+                var allowed_business_type_ids = self.allowed_business_type_ids;
+                var current_business_unit_id = self.current_business_type;
+                var company_business_type_mapping = self.company_business_type_mapping;
+                if (dropdownItem.find('.fa-square-o').length) {
+                    allowed_business_type_ids.push(companyID);
+                    dropdownItem.find('.fa-square-o').removeClass('fa-square-o').addClass('fa-check-square');
+                } else {
+                    if (allowed_business_type_ids.length > 1 && current_business_unit_id != companyID){
+                        allowed_business_type_ids.splice(allowed_business_type_ids.indexOf(companyID), 1);
+                        dropdownItem.find('.fa-check-square').addClass('fa-square-o').removeClass('fa-check-square');
+                    }
+                }
+                // We store current business type / business types
+                // In case of any failure, it goes back to standard value without error
+                var current_company_ids = self.allowed_company_ids
+                var current_company_id = current_company_ids[0];
+                for (var i = 0; i<company_business_type_mapping.length; i++){
+                    if (allowed_business_type_ids.indexOf(company_business_type_mapping[i][1]) !== -1){
+                        if (current_company_ids.indexOf(company_business_type_mapping[i][0]) === -1){
+                            current_company_ids.push(company_business_type_mapping[i][0])
+                        }
+                    }
+                }
+                session.setBusinessTypes(current_business_unit_id, allowed_business_type_ids, current_company_id, current_company_ids);
+            }else{
+                return true;
             }
-        }
-        session.setBusinessTypes(current_business_unit_id, allowed_business_type_ids, current_company_id, current_company_ids);
+        });
+
     },
 
 });

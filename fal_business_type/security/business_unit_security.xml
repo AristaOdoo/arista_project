@@ -31,5 +31,9 @@
         <field name="groups" eval="[(6, 0, [ref('base.group_erp_manager')])]"/>
         <field name="domain_force">[(1,'=',1)]</field>
     </record>
+    <!-- Arista Group -->
+    <record id="fal_arista_consolidation_group" model="res.groups">
+      <field name="name">Consolidation Group</field>
+    </record>
 </data>
 </odoo>

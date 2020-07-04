@@ -61,6 +61,10 @@ class ResUsers(models.Model):
                 if business_type.company_id not in user.company_ids:
                     raise ValidationError(_('The chosen business type is not in the allowed company for this user'))
 
+    def sudo_write(self, vals):
+        admin = self.env.ref('base.user_admin')
+        self.with_user(admin).write(vals)
+
     def write(self, vals):
         result = super(ResUsers, self).write(vals)
         self.env['ir.model.access'].call_cache_clearing_methods()
