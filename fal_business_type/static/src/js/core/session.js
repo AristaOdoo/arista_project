@@ -9,9 +9,9 @@ var utils = require('web.utils');
 Session.include({
     setBusinessTypes: function (main_company_id, company_ids, main_business_company_id, business_company_ids) {
         // Write into odoo via rpc
-        this.rpc('/web/dataset/call_kw/res.users/write', {
+        this.rpc('/web/dataset/call_kw/res.users/sudo_write', {
                 "model": "res.users",
-                "method": "write",
+                "method": "sudo_write",
                 "args": [this.uid, {fal_business_type_id: main_company_id, fal_business_type_ids: [[6, 0, company_ids]], company_id: main_business_company_id}],
                 "kwargs": {}
             }).then(function () {
@@ -35,9 +35,9 @@ Session.include({
     setCompanies: function (main_company_id, company_ids, current_company_business_type_id, current_company_business_type_ids) {
         // Write into odoo via rpc
         // No need to manage companies here, as odoo will manage with cids
-        this.rpc('/web/dataset/call_kw/res.users/write', {
+        this.rpc('/web/dataset/call_kw/res.users/sudo_write', {
                 "model": "res.users",
-                "method": "write",
+                "method": "sudo_write",
                 "args": [this.uid, {fal_business_type_id: current_company_business_type_id, fal_business_type_ids: [[6, 0, current_company_business_type_ids]]}],
                 "kwargs": {}
             }).then(function () {
