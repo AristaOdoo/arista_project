@@ -42,6 +42,7 @@ class IrActionsServer(models.Model):
             'issue_journal': '',
             'transfer_journal': '',
             'invoice_journal': '',
+            'bon_merah': '',
         }
         if adms_id and fal_business_type:
             # Action Info
@@ -90,6 +91,14 @@ class IrActionsServer(models.Model):
                 result['isSuccess'] = True
                 result['issue_journal'] = real_id.x_studio_issue_entry and real_id.x_studio_issue_entry.name or ''
                 result['invoice_journal'] = real_id.invoice_ids[0] and real_id.invoice_ids[0].name or ''
+                return result
+            if operation in [608]:
+                result['isSuccess'] = True
+                result['bon_merah'] = real_id.x_studio_bon_merah and real_id.x_studio_bon_merah.name or ''
+                return result
+            if operation in [609]:
+                result['isSuccess'] = True
+                result['bon_hijau'] = real_id.x_studio_bon_hijau and real_id.x_studio_bon_hijau.name or ''
                 return result
         result['isSuccess'] = False
         result['ErrorMsg'] = 'Share ID & Branch is required'

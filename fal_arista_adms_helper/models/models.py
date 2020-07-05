@@ -172,4 +172,14 @@ class BaseModel(models.AbstractModel):
                 return False
             else:
                 return True
+        elif model.model == 'x_spk_payment_multi':
+            if record.x_studio_bon_merah:
+                return False
+            else:
+                return True
+        elif model.model == 'x_spk_payment':
+            if record.x_studio_bon_merah or record.x_studio_bon_hijau:
+                return False
+            else:
+                return True
         return True
