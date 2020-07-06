@@ -182,4 +182,14 @@ class BaseModel(models.AbstractModel):
                 return False
             else:
                 return True
+        elif model.model == 'x_inventory_transfer':
+            if record.x_studio_journal_keluar_1 or record.x_studio_journal_masuk_2 or record.x_studio_journal_masuk:
+                return False
+            else:
+                return True
+        elif model.model == 'x_importinvadj':
+            if record.x_studio_journal_out or record.x_studio_journal_in:
+                return False
+            else:
+                return True
         return True
