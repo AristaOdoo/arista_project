@@ -43,6 +43,7 @@ class IrActionsServer(models.Model):
             'transfer_journal': '',
             'invoice_journal': '',
             'bon_merah': '',
+            'bon_hijau': '',
             'mutasi_out': '',
             'mutasi_in': '',
             'mutasi_intercompany': '',
