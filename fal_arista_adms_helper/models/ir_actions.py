@@ -49,6 +49,8 @@ class IrActionsServer(models.Model):
             'mutasi_intercompany': '',
             'adjust_in': '',
             'adjust_out': '',
+            'invoice_journal_cancel': '',
+            'issue_journal_cancel': '',
         }
         if adms_id and fal_business_type:
             # Action Info
@@ -119,6 +121,11 @@ class IrActionsServer(models.Model):
                 result['isSuccess'] = True
                 result['adjust_in'] = real_id.x_studio_journal_in and real_id.x_studio_journal_in.name or ''
                 result['adjust_out'] = real_id.x_studio_journal_out and real_id.x_studio_journal_out.name or ''
+                return result
+            if operation in [618]:
+                result['isSuccess'] = True
+                result['invoice_journal_cancel'] = real_id.x_studio_invoice_journal_cancel and real_id.x_studio_invoice_journal_cancel.name or ''
+                result['issue_journal_cancel'] = real_id.x_studio_issue_journal_cancel and real_id.x_studio_issue_journal_cancel.name or ''
                 return result
         result['isSuccess'] = False
         result['ErrorMsg'] = 'Share ID & Branch is required'
