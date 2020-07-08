@@ -106,13 +106,13 @@ class IrActionsServer(models.Model):
                 result['isSuccess'] = True
                 result['bon_merah'] = real_id.x_studio_bon_merah and real_id.x_studio_bon_merah.x_studio_nomor_bon or ''
                 result['nomor_voucher'] = real_id.x_studio_bon_merah and real_id.x_studio_bon_merah.name or ''
-                result['ar_customer'] = real_id.x_studio_spk_payment[0] and real_id.x_studio_spk_payment[0].x_studio_custname.property_account_receivable_id and real_id.x_studio_spk_payment[0].x_studio_custname.property_account_receivable_id.code or ''
+                result['ar_customer'] = real_id.x_studio_customer_account or ''
                 return result
             if operation in [609]:
                 result['isSuccess'] = True
                 result['bon_hijau'] = real_id.x_studio_bon_hijau and real_id.x_studio_bon_hijau.x_studio_nomor_bon or ''
                 result['nomor_voucher'] = real_id.x_studio_bon_hijau and real_id.x_studio_bon_hijau.name or ''
-                result['ar_customer'] = real_id.x_studio_custname.property_account_receivable_id and real_id.x_studio_custname.property_account_receivable_id.code or ''
+                result['ar_customer'] = real_id.x_studio_customer_account or ''
                 return result
             if operation in [594]:
                 result['isSuccess'] = True
