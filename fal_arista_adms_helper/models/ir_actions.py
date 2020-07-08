@@ -42,6 +42,8 @@ class IrActionsServer(models.Model):
             'issue_journal': '',
             'transfer_journal': '',
             'invoice_journal': '',
+            'nomor_voucher': '',
+            'ar_customer': '',
             'bon_merah': '',
             'bon_hijau': '',
             'mutasi_out': '',
@@ -102,11 +104,15 @@ class IrActionsServer(models.Model):
                 return result
             if operation in [608]:
                 result['isSuccess'] = True
-                result['bon_merah'] = real_id.x_studio_bon_merah and real_id.x_studio_bon_merah.name or ''
+                result['bon_merah'] = real_id.x_studio_bon_merah and real_id.x_studio_bon_merah.x_studio_nomor_bon or ''
+                result['nomor_voucher'] = real_id.x_studio_bon_merah and real_id.x_studio_bon_merah.name or ''
+                result['ar_customer'] = real_id.x_studio_custname.property_account_receivable_id and real_id.x_studio_custname.property_account_receivable_id.code or ''
                 return result
             if operation in [609]:
                 result['isSuccess'] = True
-                result['bon_hijau'] = real_id.x_studio_bon_hijau and real_id.x_studio_bon_hijau.name or ''
+                result['bon_hijau'] = real_id.x_studio_bon_hijau and real_id.x_studio_bon_hijau.x_studio_nomor_bon or ''
+                result['nomor_voucher'] = real_id.x_studio_bon_merah and real_id.x_studio_bon_merah.name or ''
+                result['ar_customer'] = real_id.x_studio_bon_merah and real_id.x_studio_bon_merah.code or ''
                 return result
             if operation in [594]:
                 result['isSuccess'] = True
