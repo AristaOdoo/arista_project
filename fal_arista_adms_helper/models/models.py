@@ -146,6 +146,9 @@ class BaseModel(models.AbstractModel):
                         real_id = self.env[field.relation].sudo().search([('x_studio_adms_id', '=', vals[key])], limit=1)
                     elif business_type and m2o_business_type and m2o_model.model not in model_exception:
                         real_id = self.env[field.relation].sudo().search([('x_studio_adms_id', '=', vals[key]), (m2o_business_type.name, '=', business_type.id)], limit=1)
+                        # Let's find it on business type level first, if not found, search again on company level
+                        if not real_id:
+                            real_id = self.env[field.relation].sudo().search([('x_studio_adms_id', '=', vals[key]), (m2o_company.name, '=', business_type.company_id.id)], limit=1)
                     # If the object doesn't have business type
                     else:
                         real_id = self.env[field.relation].sudo().search([('x_studio_adms_id', '=', vals[key])], limit=1)
