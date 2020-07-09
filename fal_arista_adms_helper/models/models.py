@@ -43,11 +43,15 @@ class BaseModel(models.AbstractModel):
             # Both table have different approach
             if model.model in ['res.partner']:
                 # If customer, do not find the business type. Only the company
+                # And do not find in partner that is vendor
+                # Means that customer and vendor can have the same ADMS ID
                 if 'customer_rank' in new_vals and new_vals['customer_rank'] > 0:
                     domain += [(company_type_field.name, '=', new_vals[company_type_field.name])]
+                    domain += [('customer_rank', '>', 0)]
                 else:
                     domain += [(company_type_field.name, '=', new_vals[company_type_field.name])]
                     domain += [(business_type_field.name, '=', new_vals[business_type_field.name])]
+                    domain += [('supplier_rank', '>', 0)]
             # Special case for x_studio_reason_code, do not find company/business type
             # Means do nothing
             elif model.model in ['x_reason_adms']:
@@ -138,10 +142,17 @@ class BaseModel(models.AbstractModel):
                     # Special case for Partner. Because ADMS split it's partner to customer and vendor
                     # Both table have different approach
                     if m2o_model.model in ['res.partner']:
-                        # Let's find it on business type level first, if not found, search again on company level
-                        real_id = self.env[field.relation].sudo().search([('x_studio_adms_id', '=', vals[key]), (m2o_business_type.name, '=', business_type.id), (m2o_company.name, '=', business_type.company_id.id)], limit=1)
-                        if not real_id:
-                            real_id = self.env[field.relation].sudo().search([('x_studio_adms_id', '=', vals[key]), (m2o_company.name, '=', business_type.company_id.id)], limit=1)
+                        # Split between Customer / Vendor Transaction.
+                        if model.model in ['purchase.order', 'purchase.order.line']:
+                            # Let's find it on business type level first, if not found, search again on company level
+                            real_id = self.env[field.relation].sudo().search([('x_studio_adms_id', '=', vals[key]), (m2o_business_type.name, '=', business_type.id), (m2o_company.name, '=', business_type.company_id.id), ('supplier_rank', '>', 0)], limit=1)
+                            if not real_id:
+                                real_id = self.env[field.relation].sudo().search([('x_studio_adms_id', '=', vals[key]), (m2o_company.name, '=', business_type.company_id.id), ('supplier_rank', '>', 0)], limit=1)
+                        else:
+                            # Let's find it on business type level first, if not found, search again on company level
+                            real_id = self.env[field.relation].sudo().search([('x_studio_adms_id', '=', vals[key]), (m2o_business_type.name, '=', business_type.id), (m2o_company.name, '=', business_type.company_id.id), ('customer_rank', '>', 0)], limit=1)
+                            if not real_id:
+                                real_id = self.env[field.relation].sudo().search([('x_studio_adms_id', '=', vals[key]), (m2o_company.name, '=', business_type.company_id.id), ('customer_rank', '>', 0)], limit=1)
                     elif m2o_model.model in ['x_reason_adms']:
                         real_id = self.env[field.relation].sudo().search([('x_studio_adms_id', '=', vals[key])], limit=1)
                     elif business_type and m2o_business_type and m2o_model.model not in model_exception:
