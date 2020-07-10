@@ -68,6 +68,10 @@ class IrActionsServer(models.Model):
             'invoice_journal_cancel': '',
             'id_issue_journal_cancel': 0,
             'issue_journal_cancel': '',
+            'id_apvo': 0,
+            'apvo': '',
+            'id_apvo_retur': 0,
+            'apvo_retur': '',
         }
         if adms_id and fal_business_type:
             # Action Info
@@ -184,6 +188,18 @@ class IrActionsServer(models.Model):
                 result['invoice_journal_cancel'] = real_id.x_studio_invoice_journal_cancel and real_id.x_studio_invoice_journal_cancel.name or ''
                 result['id_issue_journal_cancel'] = real_id.x_studio_issue_journal_cancel and real_id.x_studio_issue_journal_cancel.id or 0
                 result['issue_journal_cancel'] = real_id.x_studio_issue_journal_cancel and real_id.x_studio_issue_journal_cancel.name or ''
+                return result
+            if operation in [628]:
+                result['isSuccess'] = True
+                result['id_record'] = real_id.id or 0
+                result['id_apvo'] = real_id.x_studio_journal_apvo and real_id.x_studio_journal_apvo.id or 0
+                result['apvo'] = real_id.x_studio_journal_apvo and real_id.x_studio_journal_apvo.name or ''
+                return result
+            if operation in [583]:
+                result['isSuccess'] = True
+                result['id_record'] = real_id.id or 0
+                result['id_apvo_retur'] = real_id.x_studio_journal_apvo_retur and real_id.x_studio_journal_apvo_retur.id or 0
+                result['apvo_retur'] = real_id.x_studio_journal_apvo_retur and real_id.x_studio_journal_apvo_retur.name or ''
                 return result
         result['isSuccess'] = False
         result['ErrorMsg'] = 'Share ID & Branch is required'
