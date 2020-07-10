@@ -172,7 +172,7 @@ class BaseModel(models.AbstractModel):
 
     def check_method(self, model, record):
         if model.model == 'purchase.order':
-            if record.x_studio_journal_apvo_retur:
+            if record.x_studio_journal_apvo or record.x_studio_journal_apvo_retur:
                 return False
             else:
                 return True
