@@ -38,20 +38,35 @@ class IrActionsServer(models.Model):
         result = {
             'isSuccess': '',
             'ErrorMsg': '',
+            'id_record': '',
+            'id_pc_journal': '',
             'pc_journal': '',
+            'id_issue_journal': '',
             'issue_journal': '',
+            'id_transfer_journal': '',
             'transfer_journal': '',
+            'id_invoice_journal': '',
             'invoice_journal': '',
+            'id_nomor_voucher': '',
             'nomor_voucher': '',
             'ar_customer': '',
+            'id_bon_merah': '',
             'bon_merah': '',
+            'id_bon_hijau': '',
             'bon_hijau': '',
+            'id_mutasi_out': '',
             'mutasi_out': '',
+            'id_mutasi_in': '',
             'mutasi_in': '',
+            'id_mutasi_intercompany': '',
             'mutasi_intercompany': '',
+            'id_adjust_in': '',
             'adjust_in': '',
+            'id_adjust_out': '',
             'adjust_out': '',
+            'id_invoice_journal_cancel': '',
             'invoice_journal_cancel': '',
+            'id_issue_journal_cancel': '',
             'issue_journal_cancel': '',
         }
         if adms_id and fal_business_type:
@@ -85,52 +100,89 @@ class IrActionsServer(models.Model):
             # PC Journal
             if operation in [606]:
                 result['isSuccess'] = True
+                result['id_record'] = real_id.id
+                result['id_pc_journal'] = real_id.x_studio_issue_journal.id
                 result['pc_journal'] = real_id.x_studio_issue_journal.name
                 return result
             if operation in [607]:
                 result['isSuccess'] = True
+                result['id_record'] = real_id.id
+                result['id_pc_journal'] = real_id.x_studio_issue_journal.id
                 result['pc_journal'] = real_id.x_studio_issue_journal.name
                 return result
             if operation in [605]:
                 result['isSuccess'] = True
+                result['id_record'] = real_id.id
+                result['id_issue_journal'] = real_id.x_studio_issue_entry and real_id.x_studio_issue_entry.id or ''
                 result['issue_journal'] = real_id.x_studio_issue_entry and real_id.x_studio_issue_entry.name or ''
+                result['id_transfer_journal'] = real_id.x_studio_transfer_journal and real_id.x_studio_transfer_journal.id or ''
                 result['transfer_journal'] = real_id.x_studio_transfer_journal and real_id.x_studio_transfer_journal.name or ''
+                result['id_invoice_journal'] = real_id.invoice_ids[0] and real_id.invoice_ids[0].id or ''
                 result['invoice_journal'] = real_id.invoice_ids[0] and real_id.invoice_ids[0].name or ''
                 return result
             if operation in [592]:
                 result['isSuccess'] = True
+                result['id_record'] = real_id.id
+                result['id_issue_journal'] = real_id.x_studio_issue_entry and real_id.x_studio_issue_entry.id or ''
                 result['issue_journal'] = real_id.x_studio_issue_entry and real_id.x_studio_issue_entry.name or ''
+                result['id_invoice_journal'] = real_id.invoice_ids[0] and real_id.invoice_ids[0].id or ''
                 result['invoice_journal'] = real_id.invoice_ids[0] and real_id.invoice_ids[0].name or ''
                 return result
             if operation in [608]:
                 result['isSuccess'] = True
+                result['id_record'] = real_id.id
+                result['id_bon_merah'] = real_id.x_studio_bon_merah and real_id.x_studio_bon_merah.id or ''
                 result['bon_merah'] = real_id.x_studio_bon_merah and real_id.x_studio_bon_merah.x_studio_nomor_bon or ''
+                result['id_nomor_voucher'] = real_id.x_studio_bon_merah and real_id.x_studio_bon_merah.id or ''
                 result['nomor_voucher'] = real_id.x_studio_bon_merah and real_id.x_studio_bon_merah.name or ''
                 result['ar_customer'] = real_id.x_studio_customer_account or ''
                 return result
             if operation in [609]:
                 result['isSuccess'] = True
+                result['id_record'] = real_id.id
+                result['id_bon_hijau'] = real_id.x_studio_bon_hijau and real_id.x_studio_bon_hijau.id or ''
                 result['bon_hijau'] = real_id.x_studio_bon_hijau and real_id.x_studio_bon_hijau.x_studio_nomor_bon or ''
+                result['id_nomor_voucher'] = real_id.x_studio_bon_hijau and real_id.x_studio_bon_hijau.id or ''
                 result['nomor_voucher'] = real_id.x_studio_bon_hijau and real_id.x_studio_bon_hijau.name or ''
+                result['ar_customer'] = real_id.x_studio_customer_account or ''
+                return result
+            if operation in [625]:
+                result['isSuccess'] = True
+                result['id_record'] = real_id.id
+                result['id_bon_merah'] = real_id.x_studio_bon_merah and real_id.x_studio_bon_merah.id or ''
+                result['bon_merah'] = real_id.x_studio_bon_merah and real_id.x_studio_bon_merah.x_studio_nomor_bon or ''
+                result['id_nomor_voucher'] = real_id.x_studio_bon_merah and real_id.x_studio_bon_merah.id or ''
+                result['nomor_voucher'] = real_id.x_studio_bon_merah and real_id.x_studio_bon_merah.name or ''
                 result['ar_customer'] = real_id.x_studio_customer_account or ''
                 return result
             if operation in [594]:
                 result['isSuccess'] = True
+                result['id_record'] = real_id.id
+                result['id_mutasi_out'] = real_id.x_studio_journal_keluar_1 and real_id.x_studio_journal_keluar_1.id or ''
                 result['mutasi_out'] = real_id.x_studio_journal_keluar_1 and real_id.x_studio_journal_keluar_1.name or ''
                 return result
             if operation in [596]:
                 result['isSuccess'] = True
+                result['id_record'] = real_id.id
+                result['id_mutasi_in'] = real_id.x_studio_journal_masuk_2 and real_id.x_studio_journal_masuk_2.id or ''
                 result['mutasi_in'] = real_id.x_studio_journal_masuk_2 and real_id.x_studio_journal_masuk_2.name or ''
+                result['id_mutasi_intercompany'] = real_id.x_studio_journal_masuk and real_id.x_studio_journal_masuk.id or ''
                 result['mutasi_intercompany'] = real_id.x_studio_journal_masuk and real_id.x_studio_journal_masuk.name or ''
                 return result
             if operation in [603]:
                 result['isSuccess'] = True
+                result['id_record'] = real_id.id
+                result['id_adjust_in'] = real_id.x_studio_journal_in and real_id.x_studio_journal_in.id or ''
                 result['adjust_in'] = real_id.x_studio_journal_in and real_id.x_studio_journal_in.name or ''
+                result['id_adjust_out'] = real_id.x_studio_journal_out and real_id.x_studio_journal_out.id or ''
                 result['adjust_out'] = real_id.x_studio_journal_out and real_id.x_studio_journal_out.name or ''
                 return result
             if operation in [618]:
                 result['isSuccess'] = True
+                result['id_record'] = real_id.id
+                result['id_invoice_journal_cancel'] = real_id.x_studio_invoice_journal_cancel and real_id.x_studio_invoice_journal_cancel.id or ''
                 result['invoice_journal_cancel'] = real_id.x_studio_invoice_journal_cancel and real_id.x_studio_invoice_journal_cancel.name or ''
+                result['id_issue_journal_cancel'] = real_id.x_studio_issue_journal_cancel and real_id.x_studio_issue_journal_cancel.id or ''
                 result['issue_journal_cancel'] = real_id.x_studio_issue_journal_cancel and real_id.x_studio_issue_journal_cancel.name or ''
                 return result
         result['isSuccess'] = False

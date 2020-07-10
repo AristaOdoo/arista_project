@@ -192,7 +192,7 @@ class BaseModel(models.AbstractModel):
             else:
                 return True
         elif model.model == 'x_spk_payment':
-            if record.x_studio_bon_merah or record.x_studio_bon_hijau:
+            if record.x_studio_bon_hijau:
                 return False
             else:
                 return True
