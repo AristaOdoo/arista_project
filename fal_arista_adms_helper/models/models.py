@@ -182,7 +182,7 @@ class BaseModel(models.AbstractModel):
             else:
                 return True
         elif model.model == 'sale.order':
-            if record.x_studio_issue_entry or record.invoice_ids or record.x_studio_transfer_journal:
+            if record.x_studio_issue_entry or record.invoice_ids or record.x_studio_transfer_journal or record.x_studio_issue_journal_cancel or record.x_studio_invoice_journal_cancel:
                 return False
             else:
                 return True
