@@ -195,13 +195,13 @@ class IrActionsServer(models.Model):
                 result['id_apvo'] = real_id.x_studio_journal_apvo and real_id.x_studio_journal_apvo.id or 0
                 result['apvo'] = real_id.x_studio_journal_apvo and real_id.x_studio_journal_apvo.name or ''
                 return result
-            if operation in [630]:
+            if operation in [631]:
                 result['isSuccess'] = True
                 result['id_record'] = real_id.id or 0
                 result['id_apvo_retur'] = real_id.x_studio_journal_apvo_retur and real_id.x_studio_journal_apvo_retur.id or 0
                 result['apvo_retur'] = real_id.x_studio_journal_apvo_retur and real_id.x_studio_journal_apvo_retur.name or ''
                 return result
-            if operation in [631]:
+            if operation in [632]:
                 result['isSuccess'] = True
                 result['id_record'] = real_id.id or 0
                 result['id_invoice_journal_cancel'] = real_id.x_studio_invoice_journal_cancel and real_id.x_studio_invoice_journal_cancel.id or 0
