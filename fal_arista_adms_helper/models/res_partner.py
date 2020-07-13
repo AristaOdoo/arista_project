@@ -92,7 +92,7 @@ class ResPartner(models.Model):
                 return models.lazy_name_get(self.browse(partner_ids))
             else:
                 return []
-        return super(Partner, self)._name_search(name, args, operator=operator, limit=limit, name_get_uid=name_get_uid)
+        return super(ResPartner, self)._name_search(name, args, operator=operator, limit=limit, name_get_uid=name_get_uid)
 
     @api.depends('is_company', 'name', 'parent_id.name', 'type', 'company_name', 'x_studio_adms_id')
     def _compute_display_name(self):

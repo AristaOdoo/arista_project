@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_account_invoice_filter_falmultipaymentwizard" model="ir.ui.view">
+        <field name="name">account.move.select.falmultipaymentwizard</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_account_invoice_filter" />
+        <field name="arch" type="xml">
+            <filter name="late" position="before">
+                <filter name="due_within_one_week" string="Due Within One Week" domain="['|',('invoice_date_due', '&lt;', (context_today() + datetime.timedelta(days=7)).strftime('%%Y-%%m-%%d')), ('invoice_date_due','=',False), ('state', '=', 'posted')]" help="Overdue invoices within one week"/>
+            </filter>
+        </field>
+    </record>
+</odoo>

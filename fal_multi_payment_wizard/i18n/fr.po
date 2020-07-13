@@ -1,0 +1,213 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* fal_multi_payment_wizard
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 13.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-12-30 16:04+0000\n"
+"PO-Revision-Date: 2019-12-30 17:09+0100\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: \n"
+"Language: fr\n"
+"X-Generator: Poedit 2.2.3\n"
+
+#. module: fal_multi_payment_wizard
+#: model:ir.model.fields,field_description:fal_multi_payment_wizard.field_account_payment_register__fal_create_batch_payment
+msgid "Create Batch Payment"
+msgstr "Créer paiement par lots"
+
+#. module: fal_multi_payment_wizard
+#: model:ir.model.fields,field_description:fal_multi_payment_wizard.field_fal_multi_payment_wizard__create_uid
+msgid "Created by"
+msgstr "Créé par"
+
+#. module: fal_multi_payment_wizard
+#: model:ir.model.fields,field_description:fal_multi_payment_wizard.field_fal_multi_payment_wizard__create_date
+msgid "Created on"
+msgstr "Créé le"
+
+#. module: fal_multi_payment_wizard
+#: model:ir.model.fields,field_description:fal_multi_payment_wizard.field_fal_multi_payment_wizard__currency_id
+msgid "Currency"
+msgstr "Devise"
+
+#. module: fal_multi_payment_wizard
+#: model:ir.model.fields.selection,name:fal_multi_payment_wizard.selection__fal_multi_payment_wizard__partner_type__customer
+msgid "Customer"
+msgstr "Client"
+
+#. module: fal_multi_payment_wizard
+#: model:ir.model.fields,field_description:fal_multi_payment_wizard.field_fal_multi_payment_wizard__display_name
+msgid "Display Name"
+msgstr "Nom affiché"
+
+#. module: fal_multi_payment_wizard
+#: model_terms:ir.ui.view,arch_db:fal_multi_payment_wizard.view_account_invoice_filter_falmultipaymentwizard
+msgid "Due Within One Week"
+msgstr "Dû dans la semaine"
+
+#. module: fal_multi_payment_wizard
+#: model:ir.model.fields,field_description:fal_multi_payment_wizard.field_fal_multi_payment_wizard__id
+msgid "ID"
+msgstr "ID"
+
+#. module: fal_multi_payment_wizard
+#: code:addons/fal_multi_payment_wizard/wizard/fal_multi_payment_wizard.py:0
+#, python-format
+msgid "In order to pay multiple invoices at once, they must use the same currency."
+msgstr "Pour payer plusieurs factures à la fois, elles doivent utiliser la même devise."
+
+#. module: fal_multi_payment_wizard
+#: model:ir.model.fields,field_description:fal_multi_payment_wizard.field_fal_multi_payment_wizard__invoice_ids
+msgid "Invoices"
+msgstr "Factures"
+
+#. module: fal_multi_payment_wizard
+#: model_terms:ir.ui.view,arch_db:fal_multi_payment_wizard.account_register_payment_ext
+msgid "Journal Selection"
+msgstr "Sélection du journal"
+
+#. module: fal_multi_payment_wizard
+#: model:ir.model.fields,field_description:fal_multi_payment_wizard.field_fal_multi_payment_wizard____last_update
+msgid "Last Modified on"
+msgstr "Dernière mise à jour le"
+
+#. module: fal_multi_payment_wizard
+#: model:ir.model.fields,field_description:fal_multi_payment_wizard.field_fal_multi_payment_wizard__write_uid
+msgid "Last Updated by"
+msgstr "Dernière mise à jour par"
+
+#. module: fal_multi_payment_wizard
+#: model:ir.model.fields,field_description:fal_multi_payment_wizard.field_fal_multi_payment_wizard__write_date
+msgid "Last Updated on"
+msgstr "Dernière modification le"
+
+#. module: fal_multi_payment_wizard
+#: model:ir.model.fields,help:fal_multi_payment_wizard.field_fal_multi_payment_wizard__payment_method_id
+msgid ""
+"Manual: Get paid by cash, check or any other method outside of Odoo.\n"
+"Electronic: Get paid automatically through a payment acquirer by requesting a transaction on a card saved by the customer when buying or subscribing online "
+"(payment token).\n"
+"Check: Pay bill by check and print it from Odoo.\n"
+"Batch Deposit: Encase several customer checks at once by generating a batch deposit to submit to your bank. When encoding the bank statement in Odoo, you are "
+"suggested to reconcile the transaction with the batch deposit.To enable batch deposit, module account_batch_payment must be installed.\n"
+"SEPA Credit Transfer: Pay bill from a SEPA Credit Transfer file you submit to your bank. To enable sepa credit transfer, module account_sepa must be installed "
+msgstr ""
+"Manuel: Obtenez paiement en espèces, chèque ou toute autre méthode en dehors d'Odoo.\n"
+"Électronique : Faites payer automatiquement par l'intermédiaire d'un acquéreur de paiement en demandant une transaction sur une carte enregistrée par le "
+"client lors de l'achat ou de l'abonnement en ligne (jeton de paiement).\n"
+"Chèque : Payez la facture par chèque et imprimez-la à partir d'Odoo.\n"
+"Dépôt par lots : Encaisser plusieurs chèques clients à la fois en générant un dépôt par lots à soumettre à votre banque. Lors de l'encodage du relevé bancaire "
+"dans Odoo, il vous est suggéré de concilier la transaction avec le dépôt par lots. Pour permettre le dépôt par lots, le module account_batch_payment doit être "
+"installé.\n"
+"Transfert de crédit SEPA : Payez la facture d'un dossier de transfert de crédit SEPA que vous soumettez à votre banque. Pour permettre le transfert de crédit "
+"sepa, module account_sepa doit être installé"
+
+#. module: fal_multi_payment_wizard
+#: model:ir.model.fields,field_description:fal_multi_payment_wizard.field_fal_multi_payment_wizard__communication
+msgid "Memo"
+msgstr "Mémo"
+
+#. module: fal_multi_payment_wizard
+#: model:ir.model,name:fal_multi_payment_wizard.model_fal_multi_payment_wizard
+msgid "Multi Payment Wizard"
+msgstr "Assistant multi paiement"
+
+#. module: fal_multi_payment_wizard
+#: model:ir.model.fields,field_description:fal_multi_payment_wizard.field_fal_multi_payment_wizard__fal_number
+msgid "Number"
+msgstr "Numéro"
+
+#. module: fal_multi_payment_wizard
+#: model_terms:ir.ui.view,arch_db:fal_multi_payment_wizard.view_account_invoice_filter_falmultipaymentwizard
+msgid "Overdue invoices within one week"
+msgstr "Factures à échéance dans la semaine"
+
+#. module: fal_multi_payment_wizard
+#: model:ir.model.fields,field_description:fal_multi_payment_wizard.field_fal_multi_payment_wizard__partner_id
+msgid "Partner"
+msgstr "Partenaire"
+
+#. module: fal_multi_payment_wizard
+#: model:ir.model.fields,field_description:fal_multi_payment_wizard.field_fal_multi_payment_wizard__partner_type
+msgid "Partner Type"
+msgstr "Type de partenaire"
+
+#. module: fal_multi_payment_wizard
+#: model:ir.model.fields,field_description:fal_multi_payment_wizard.field_fal_multi_payment_wizard__amount
+msgid "Payment Amount"
+msgstr "Montant du paiement"
+
+#. module: fal_multi_payment_wizard
+#: model:ir.model.fields,field_description:fal_multi_payment_wizard.field_fal_multi_payment_wizard__payment_date
+msgid "Payment Date"
+msgstr "Date de règlement"
+
+#. module: fal_multi_payment_wizard
+#: model:ir.model.fields,field_description:fal_multi_payment_wizard.field_fal_multi_payment_wizard__journal_id
+msgid "Payment Journal"
+msgstr "Journal des Paiements"
+
+#. module: fal_multi_payment_wizard
+#: model:ir.model.fields,field_description:fal_multi_payment_wizard.field_account_payment_register__payment_wizard_line_ids
+#: model:ir.model.fields,field_description:fal_multi_payment_wizard.field_fal_multi_payment_wizard__register_payments_id
+msgid "Payment List"
+msgstr "Liste de paiements"
+
+#. module: fal_multi_payment_wizard
+#: model:ir.model.fields,field_description:fal_multi_payment_wizard.field_fal_multi_payment_wizard__payment_method_id
+msgid "Payment Method Type"
+msgstr "Type des Méthodes de Paiement"
+
+#. module: fal_multi_payment_wizard
+#: model:ir.model.fields,field_description:fal_multi_payment_wizard.field_fal_multi_payment_wizard__payment_type
+msgid "Payment Type"
+msgstr "Type de paiement"
+
+#. module: fal_multi_payment_wizard
+#: model_terms:ir.ui.view,arch_db:fal_multi_payment_wizard.account_register_payment_ext
+msgid "Payment Wizard Line"
+msgstr "Assistant Ligne de paiement "
+
+#. module: fal_multi_payment_wizard
+#: code:addons/fal_multi_payment_wizard/wizard/fal_multi_payment_wizard.py:0
+#, python-format
+msgid "Payments"
+msgstr "Paiements"
+
+#. module: fal_multi_payment_wizard
+#: model:ir.model.fields.selection,name:fal_multi_payment_wizard.selection__fal_multi_payment_wizard__payment_type__inbound
+msgid "Receive Money"
+msgstr "Règlement"
+
+#. module: fal_multi_payment_wizard
+#: model:ir.model,name:fal_multi_payment_wizard.model_account_payment_register
+msgid "Register Payment"
+msgstr "Enregistrer un paiement"
+
+#. module: fal_multi_payment_wizard
+#: model:ir.model.fields.selection,name:fal_multi_payment_wizard.selection__fal_multi_payment_wizard__payment_type__outbound
+msgid "Send Money"
+msgstr "Envoyer de l'argent"
+
+#. module: fal_multi_payment_wizard
+#: model:ir.model.fields,field_description:fal_multi_payment_wizard.field_account_payment_register__fal_split_multi_payment
+msgid "Split payments for each invoice"
+msgstr "Fractionner les paiements fractionnés pour chaque facture"
+
+#. module: fal_multi_payment_wizard
+#: model:ir.model.fields.selection,name:fal_multi_payment_wizard.selection__fal_multi_payment_wizard__partner_type__supplier
+msgid "Vendor"
+msgstr "Fournisseur"
+
+#. module: fal_multi_payment_wizard
+#: code:addons/fal_multi_payment_wizard/wizard/fal_multi_payment_wizard.py:0
+#, python-format
+msgid "You can only register payments for open invoices"
+msgstr "Vous pouvez enregistrer des paiements uniquement pour des factures ouvertes"

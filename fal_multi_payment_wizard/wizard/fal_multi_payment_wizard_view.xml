@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="account_register_payment_ext" model="ir.ui.view">
+            <field name="name">account.pament.ext</field>
+            <field name="model">account.payment.register</field>
+            <field name="inherit_id" ref="account.view_account_payment_form_multi"/>
+            <field name="arch" type="xml">
+                <field name="group_payment" position="after">
+                    <field name="fal_split_multi_payment" attrs="{'invisible': [('group_payment', '=', True)]}"/>
+                    <field name="fal_create_batch_payment"/>
+                </field>
+                <xpath expr="//field[@name='group_payment']" position="attributes">
+                    <attribute name="attrs">{'invisible': [('fal_split_multi_payment', '=', True)]}</attribute>
+                </xpath>
+                <xpath expr="//form/group" position="inside">
+                    <field name="payment_wizard_line_ids" attrs="{'invisible': [('fal_split_multi_payment', '=', False)]}">
+                        <tree string="Payment Wizard Line" editable="bottom" create="false">
+                            <field name="payment_type" invisible="1"/>
+                            <field name="partner_type" invisible="1"/>
+                            <field name="partner_id" readonly="1"/>
+                            <field name="invoice_ids" invisible="1"/>
+                            <field name="fal_number"/>
+                            <field name="journal_id" string="Journal Selection"/>
+                            <field name="payment_method_id" />
+                            <field name="payment_date"/>
+                            <field name="communication"/>
+                            <field name="amount"/>
+                            <field name="currency_id" invisible="1"/>
+                        </tree>
+                    </field>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
