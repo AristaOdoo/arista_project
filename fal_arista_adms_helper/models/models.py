@@ -107,7 +107,14 @@ class BaseModel(models.AbstractModel):
                         new_o2mid = []
                         # Here we want to map between the ADMS id given by API to Odoo ID
                         for o2mid in o2m[2]:
-                            new_o2mid.append(self.env[new_model.model].sudo().search([('x_studio_adms_id', '=', o2mid), (component_business_type_field.name, '=', business_type.id)], limit=1).id)
+                            # If Tax, need to know if it's for sale/purchase
+                            if new_model.model in ['account.tax']:
+                                if model.model in ['x_po_tax', 'purchase.order.line']:
+                                    new_o2mid.append(self.env[new_model.model].sudo().search([('x_studio_adms_id', '=', o2mid), (component_business_type_field.name, '=', business_type.id), ('type_tax_use', '=', 'purchase')], limit=1).id)
+                                else:
+                                    new_o2mid.append(self.env[new_model.model].sudo().search([('x_studio_adms_id', '=', o2mid), (component_business_type_field.name, '=', business_type.id), ('type_tax_use', '=', 'sale')], limit=1).id)
+                            else:
+                                new_o2mid.append(self.env[new_model.model].sudo().search([('x_studio_adms_id', '=', o2mid), (component_business_type_field.name, '=', business_type.id)], limit=1).id)
                         new_vals[key] = [(6, 0, new_o2mid)]
             # If it's a share id field for many2one relation
             # Find the object based on field search
