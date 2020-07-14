@@ -155,6 +155,11 @@ class BaseModel(models.AbstractModel):
                                 real_id = self.env[field.relation].sudo().search([('x_studio_adms_id', '=', vals[key]), (m2o_company.name, '=', business_type.company_id.id), ('customer_rank', '>', 0)], limit=1)
                     elif m2o_model.model in ['x_reason_adms']:
                         real_id = self.env[field.relation].sudo().search([('x_studio_adms_id', '=', vals[key])], limit=1)
+                    elif m2o_model.model in ['account.tax']:
+                        if model.model in ['x_po_tax', 'purchase.order.line']:
+                            real_id = self.env[field.relation].sudo().search([('x_studio_adms_id', '=', vals[key]), (m2o_business_type.name, '=', business_type.id), ('type_tax_use', '=', 'purchase')], limit=1)
+                        else:
+                            real_id = self.env[field.relation].sudo().search([('x_studio_adms_id', '=', vals[key]), (m2o_business_type.name, '=', business_type.id), ('x_studio_adms_id', '=', vals[key]), ('type_tax_use', '=', 'sale')], limit=1)
                     elif business_type and m2o_business_type and m2o_model.model not in model_exception:
                         real_id = self.env[field.relation].sudo().search([('x_studio_adms_id', '=', vals[key]), (m2o_business_type.name, '=', business_type.id)], limit=1)
                         # Let's find it on business type level first, if not found, search again on company level
