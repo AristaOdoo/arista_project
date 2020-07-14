@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<odoo>
+    <data noupdate="1">
+        <record id="fal_group_cancel_account" model="res.groups">
+            <field name="name">Accounting Reset to Draft Access</field>
+        </record>
+    </data>
+</odoo>
+
