@@ -18,3 +18,20 @@ class MassGenerateAPVO(models.TransientModel):
         ctx = dict(self.env.context or {})
         ctx.update({'active_ids': self.purchase_order_ids.ids, 'active_model': 'purchase.order'})
         sa_mass_APVO.with_context(ctx).run()
+
+
+class MassGenerateAPVORetur(models.TransientModel):
+    _name = "mass.generate.apvo.retur"
+    _description = 'Mass Generate APVO Retur'
+
+    purchase_order_ids = fields.Many2many('purchase.order', string="Purchases")
+
+    def call_mass_apvo(self):
+        for purchase_order_id in self.purchase_order_ids:
+            if purchase_order_id.partner_id.id != self.purchase_order_ids[0].partner_id.id:
+                raise UserError(
+                    _('Hanya bisa membuat APVO Retur gabungan untuk vendor yang sama!'))
+        sa_mass_APVO_retur = self.env['ir.actions.server'].browse(639)
+        ctx = dict(self.env.context or {})
+        ctx.update({'active_ids': self.purchase_order_ids.ids, 'active_model': 'purchase.order'})
+        sa_mass_APVO_retur.with_context(ctx).run()
