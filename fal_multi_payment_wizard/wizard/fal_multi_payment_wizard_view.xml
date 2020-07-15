@@ -7,8 +7,8 @@
             <field name="inherit_id" ref="account.view_account_payment_form_multi"/>
             <field name="arch" type="xml">
                 <field name="group_payment" position="after">
-                    <field name="fal_split_multi_payment" attrs="{'invisible': [('group_payment', '=', True)]}"/>
-                    <field name="fal_create_batch_payment"/>
+                    <field name="fal_split_multi_payment" attrs="{'invisible': 1}"/>
+                    <field name="fal_create_batch_payment" invisible="1"/>
                 </field>
                 <xpath expr="//field[@name='group_payment']" position="attributes">
                     <attribute name="attrs">{'invisible': [('fal_split_multi_payment', '=', True)]}</attribute>

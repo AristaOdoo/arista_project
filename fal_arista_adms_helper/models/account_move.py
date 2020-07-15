@@ -70,3 +70,9 @@ class AccountMove(models.Model):
                 msg += ': <a href=# data-oe-model=account.move data-oe-id=%d>%s</a>' % (invoice.id, invoice.name)
                 asset.message_post(body=msg)
         return assets
+
+    def adms_js_assign_outstanding_line(self, line_id):
+        self.ensure_one()
+        lines = self.env['account.move.line'].browse(line_id)
+        lines += self.line_ids.filtered(lambda line: line.account_id == lines[0].account_id and line.partner_id == lines[0].partner_id and not line.reconciled)
+        return lines.reconcile()
