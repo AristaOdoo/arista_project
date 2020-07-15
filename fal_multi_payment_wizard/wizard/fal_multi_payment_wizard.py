@@ -2,6 +2,7 @@
 
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
+import datetime
 import logging
 _logger = logging.getLogger(__name__)
 
@@ -27,6 +28,49 @@ MAP_INVOICE_TYPE_PARTNER_TYPE = {
 
 class account_register_payments(models.TransientModel):
     _inherit = "account.payment.register"
+
+    @api.model
+    def default_get(self, fields):
+        rec = {}
+        active_ids = self._context.get('active_ids')
+        active_model = self._context.get('active_model')
+        if active_model == 'account.move' and len(active_ids) > 1:
+            if not active_ids:
+                return rec
+            invoices = self.env['account.move'].browse(active_ids)
+
+            # Check all invoices are open
+            if any(invoice.state != 'posted' or invoice.invoice_payment_state != 'not_paid' or not invoice.is_invoice() for invoice in invoices):
+                raise UserError(_("You can only register payments for open invoices"))
+            # Check all invoices are inbound or all invoices are outbound
+            outbound_list = [invoice.is_outbound() for invoice in invoices]
+            first_outbound = invoices[0].is_outbound()
+            if any(x != first_outbound for x in outbound_list):
+                raise UserError(_("You can only register at the same time for payment that are all inbound or all outbound"))
+            if any(inv.company_id != invoices[0].company_id for inv in invoices):
+                raise UserError(_("You can only register at the same time for payment that are all from the same company"))
+            if 'invoice_ids' not in rec:
+                rec['invoice_ids'] = [(6, 0, invoices.ids)]
+            if 'journal_id' not in rec:
+                rec['journal_id'] = self.env['account.journal'].search([('company_id', '=', self.env.company.id), ('type', 'in', ('bank', 'cash'))], limit=1).id
+            if 'payment_method_id' not in rec:
+                if invoices[0].is_inbound():
+                    domain = [('payment_type', '=', 'inbound')]
+                else:
+                    domain = [('payment_type', '=', 'outbound')]
+                rec['payment_method_id'] = self.env['account.payment.method'].search(domain, limit=1).id
+            if 'fal_split_multi_payment' not in rec:
+                rec['fal_split_multi_payment'] = True
+
+            if 'payment_date' not in rec:
+                rec['payment_date'] = datetime.date.today()
+
+            if 'payment_wizard_line_ids' not in rec:
+                rec['payment_wizard_line_ids'] = self._default_payment_wizard_line_ids()
+
+            return rec
+        else:
+            return super(account_register_payments, self).default_get(fields)
 
     @api.onchange('journal_id')
     def _onchange_journal(self):
@@ -116,16 +160,25 @@ class account_register_payments(models.TransientModel):
         return {'type': 'ir.actions.act_window_close'}
 
     def create_payments(self):
-        if self.fal_split_multi_payment:
-            self.create_multi_payment()
-        else:
-            res = super(account_register_payments, self).create_payments()
-            if self.fal_create_batch_payment:
-                batch = self.env['account.payment'].search(res['domain']).create_batch_payment()
-                batch_id = self.env['account.batch.payment'].browse(batch['res_id'])
-                for bp in batch_id.payment_ids:
-                    for invoice in bp.invoice_ids:
-                        invoice.write({'invoice_payment_ref': batch_id.name})
+        # create entries only
+        payment_moves = self._prepare_payment_moves()
+        AccountMove = self.env['account.move'].with_context(default_type='entry')
+        moves = AccountMove.create(payment_moves)
+        moves.filtered(lambda move: move.journal_id.post_at != 'bank_rec').post()
+        for payment in self:
+            for rec in payment.payment_wizard_line_ids:
+                for line in moves.line_ids.filtered(lambda a: a.name.split(":")[-1] == ' ' + rec.invoice_ids[0].name):
+                    rec.invoice_ids[0].js_assign_outstanding_line(line.id)
+        # if self.fal_split_multi_payment:
+        #     self.create_multi_payment()
+        # else:
+        #     res = super(account_register_payments, self).create_payments()
+        #     if self.fal_create_batch_payment:
+        #         batch = self.env['account.payment'].search(res['domain']).create_batch_payment()
+        #         batch_id = self.env['account.batch.payment'].browse(batch['res_id'])
+        #         for bp in batch_id.payment_ids:
+        #             for invoice in bp.invoice_ids:
+        #                 invoice.write({'invoice_payment_ref': batch_id.name})
 
 
     payment_wizard_line_ids = fields.One2many(
@@ -135,6 +188,65 @@ class account_register_payments(models.TransientModel):
         string="Split payments for each invoice", default=True)
     fal_create_batch_payment = fields.Boolean(
         string="Create Batch Payment", default=False)
+
+    def _prepare_payment_moves(self):
+        all_move_vals = []
+        for payment in self:
+            line_ids = []
+            total_amount = 0
+            for pay in payment.payment_wizard_line_ids:
+                partner_id = pay.partner_id.commercial_partner_id or pay.invoice_ids[0].partner_id
+                counterpart_amount = -pay.amount
+                liquidity_line_account = payment.journal_id.default_credit_account_id
+                destination_account = pay.invoice_ids[0].mapped(
+                    'line_ids.account_id').filtered(
+                        lambda account: account.user_type_id.type in ('receivable', 'payable'))[0]
+
+                if pay.payment_type == 'outbound':
+                    counterpart_amount = pay.amount
+                    liquidity_line_account = payment.journal_id.default_debit_account_id
+
+                total_amount += counterpart_amount
+
+                rec_pay_line_name = ''
+
+                if pay.partner_type == 'customer':
+                    if pay.payment_type == 'inbound':
+                        rec_pay_line_name += _("Customer Payment")
+                    elif pay.payment_type == 'outbound':
+                        rec_pay_line_name += _("Customer Credit Note")
+                elif pay.partner_type == 'supplier':
+                    if pay.payment_type == 'inbound':
+                        rec_pay_line_name += _("Vendor Credit Note")
+                    elif pay.payment_type == 'outbound':
+                        rec_pay_line_name += _("Vendor Payment")
+                if pay.invoice_ids:
+                    rec_pay_line_name += ': %s' % ', '.join(pay.invoice_ids.mapped('name'))
+
+                vals = (0, 0, {'name': rec_pay_line_name,
+                        'debit': counterpart_amount > 0.0 and counterpart_amount or 0.0,
+                        'credit': counterpart_amount < 0.0 and -counterpart_amount or 0.0,
+                        'date_maturity': payment.payment_date,
+                        'partner_id': partner_id.id,
+                        'account_id': destination_account.id,
+                })
+                line_ids.append(vals)
+
+            value = (0, 0, {'name': 'Payment',
+                    'debit': total_amount < 0.0 and -total_amount or 0.0,
+                    'credit': total_amount > 0.0 and total_amount or 0.0,
+                    'date_maturity': payment.payment_date,
+                    'account_id': liquidity_line_account.id,
+            })
+            line_ids.append(value)
+
+            move_vals = {
+                'date': payment.payment_date,
+                # 'ref': 'ref',
+                'journal_id': payment.journal_id.id,
+                'line_ids': line_ids,
+            }
+            return move_vals
 
 
 class fal_multi_payment_wizard(models.TransientModel):
