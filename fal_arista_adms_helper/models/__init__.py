@@ -1,4 +1,5 @@
 from . import account_move
+from . import purchase
 from . import models
 from . import ir_actions
 from . import stock_inventory
