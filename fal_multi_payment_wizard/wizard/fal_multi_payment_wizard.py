@@ -52,7 +52,8 @@ class account_register_payments(models.TransientModel):
             if 'invoice_ids' not in rec:
                 rec['invoice_ids'] = [(6, 0, invoices.ids)]
             if 'journal_id' not in rec:
-                rec['journal_id'] = self.env['account.journal'].search([('company_id', '=', self.env.company.id), ('type', 'in', ('bank', 'cash'))], limit=1).id
+                user_id = self.env['res.users'].browse(self.env.uid)
+                rec['journal_id'] = self.env['account.journal'].search([('fal_business_type', '=', user_id.fal_business_type_id.id), ('company_id', '=', self.env.company.id), ('type', 'in', ('bank', 'cash'))], limit=1).id
             if 'payment_method_id' not in rec:
                 if invoices[0].is_inbound():
                     domain = [('payment_type', '=', 'inbound')]
@@ -68,9 +69,19 @@ class account_register_payments(models.TransientModel):
             if 'payment_wizard_line_ids' not in rec:
                 rec['payment_wizard_line_ids'] = self._default_payment_wizard_line_ids()
 
+            user_id = self.env['res.users'].browse(self.env.uid)
+            rec['fal_business_type'] = user_id.fal_business_type_id and user_id.fal_business_type_id.id or False
             return rec
         else:
             return super(account_register_payments, self).default_get(fields)
+
+    @api.onchange('fal_business_type')
+    def _onchange_fal_business_type(self):
+        if self.fal_business_type:
+            domain = {
+                'journal_id': [('fal_business_type', '=', self.fal_business_type.id), ('type', 'in', ['bank', 'cash'])],
+            }
+            return {'domain': domain}
 
     @api.onchange('journal_id')
     def _onchange_journal(self):
@@ -163,23 +174,140 @@ class account_register_payments(models.TransientModel):
         # create entries only
         payment_moves = self._prepare_payment_moves()
         AccountMove = self.env['account.move'].with_context(default_type='entry')
+        # In Arista, they can add more lines on register payment
+        # But if the line account is the same, we need to combine (Logically only 1)
+        for extra_line in self.extra_lines:
+            same_account_found = False
+            for payment_move in payment_moves['line_ids']:
+                if payment_move[2]['account_id'] == extra_line.account_id.id:
+                    payment_move[2]['debit'] = payment_move[2]['debit'] + extra_line.debit
+                    payment_move[2]['credit'] = payment_move[2]['credit'] + extra_line.credit
+                    same_account_found = True
+            if not same_account_found:
+                payment_moves['line_ids'].append((0, 0, {
+                    'name': extra_line.name,
+                    'debit': extra_line.debit,
+                    'credit': extra_line.credit,
+                    'account_id': extra_line.account_id.id,
+                }))
         moves = AccountMove.create(payment_moves)
+        # In Arista there is a condition that Head Office pay for other branch purchases.
+        # So, we need construct the data per branch
+        value_line_ids_per_branch = {}
+        main_entries_line_to_delete = []
+        total_debit_other_branch = 0
+        total_credit_other_branch = 0
+
+        for move_line in moves.line_ids:
+            if move_line.x_studio_branch_of_account.id != self.journal_id.fal_business_type.id:
+                if move_line.x_studio_branch_of_account.id not in value_line_ids_per_branch:
+                    value_line_ids_per_branch[move_line.x_studio_branch_of_account.id] = {
+                        'debit': move_line.debit,
+                        'credit': move_line.credit,
+                        'line_ids': [(0, 0, {
+                            'name': move_line.name,
+                            'quantity': move_line.quantity,
+                            'ref': move_line.ref,
+                            'debit': move_line.debit,
+                            'credit': move_line.credit,
+                            'account_id': move_line.account_id.id,
+                            'x_studio_per_line_dmsrefnum': move_line.x_studio_per_line_dmsrefnum,
+                            'product_dimension_id': move_line.product_dimension_id and move_line.product_dimension_id.id or False,
+                            'no_rangka_id': move_line.no_rangka_id and move_line.no_rangka_id.id or False,
+                            'partner_id': move_line.partner_id and move_line.partner_id.id or False,
+                        })],
+                    }
+                else:
+                    value_line_ids_per_branch[move_line.x_studio_branch_of_account.id]['debit'] = value_line_ids_per_branch[move_line.x_studio_branch_of_account.id]['debit'] + move_line.debit
+                    value_line_ids_per_branch[move_line.x_studio_branch_of_account.id]['credit'] = value_line_ids_per_branch[move_line.x_studio_branch_of_account.id]['credit'] + move_line.credit
+                    value_line_ids_per_branch[move_line.x_studio_branch_of_account.id]['line_ids'].append((0, 0, {
+                        'name': move_line.name,
+                        'quantity': move_line.quantity,
+                        'ref': move_line.ref,
+                        'debit': move_line.debit,
+                        'credit': move_line.credit,
+                        'account_id': move_line.account_id.id,
+                        'x_studio_per_line_dmsrefnum': move_line.x_studio_per_line_dmsrefnum,
+                        'product_dimension_id': move_line.product_dimension_id and move_line.product_dimension_id.id or False,
+                        'no_rangka_id': move_line.no_rangka_id and move_line.no_rangka_id.id or False,
+                        'partner_id': move_line.partner_id and move_line.partner_id.id or False,
+                    }))
+                total_debit_other_branch += move_line.debit
+                total_credit_other_branch += move_line.credit
+                main_entries_line_to_delete.append(move_line.id)
+
+        # Select intercompany journal to use
+        unit = self.env['product.product'].search([('x_studio_adms_id', '=', '99')], limit=1).with_context(active_test=False)
+        product_category = unit.categ_id
+        Property_to_branch = self.env['ir.property'].with_context(force_company=self.journal_id.company_id.id, force_business_type=self.journal_id.fal_business_type.id)
+        pc_out_in_pemusatan_to_branch = Property_to_branch.get_multi('property_stock_account_output_input_main_categ_id', product_category._name, [product_category.id])
+        intercompany_account = pc_out_in_pemusatan_to_branch[product_category.id].id
+
+        # Change initial journal to interbranch first
+        ic_value = total_debit_other_branch - total_credit_other_branch
+        main_journal_change = []
+        main_journal_change.append((0, 0, {
+            'name': "InterBranch Journal",
+            'quantity': 1,
+            'ref': 'InterBranch Journal',
+            'debit': ic_value if ic_value > 0 else 0,
+            'credit': ic_value if ic_value <= 0 else 0,
+            'account_id': intercompany_account,
+        }))
+        for main_entries_line_to_delete_id in main_entries_line_to_delete:
+            main_journal_change.append((2, main_entries_line_to_delete_id))
+        # Apply new line to move
+        moves.write({'line_ids': main_journal_change})
+        # Reconcile
         moves.filtered(lambda move: move.journal_id.post_at != 'bank_rec').post()
         for payment in self:
             for rec in payment.payment_wizard_line_ids:
-                for line in moves.line_ids.filtered(lambda a: a.name.split(":")[-1] == ' ' + rec.invoice_ids[0].name):
+                for line in moves.line_ids.filtered(lambda a: a.name.split(":")[-1] == ' ' + rec.invoice_ids[0].name and a.account_internal_type in ['receivable', 'payable']):
                     rec.invoice_ids[0].js_assign_outstanding_line(line.id)
-        # if self.fal_split_multi_payment:
-        #     self.create_multi_payment()
-        # else:
-        #     res = super(account_register_payments, self).create_payments()
-        #     if self.fal_create_batch_payment:
-        #         batch = self.env['account.payment'].search(res['domain']).create_batch_payment()
-        #         batch_id = self.env['account.batch.payment'].browse(batch['res_id'])
-        #         for bp in batch_id.payment_ids:
-        #             for invoice in bp.invoice_ids:
-        #                 invoice.write({'invoice_payment_ref': batch_id.name})
 
+        ##############################################################
+        # Create new journal for each branch
+        for value_line_id_per_branch in value_line_ids_per_branch:
+            # Select account and journal
+            branch = self.env['fal.business.type'].browse(value_line_id_per_branch)
+            company = branch.company_id
+            Property_to_branch = self.env['ir.property'].with_context(force_company=company.id, force_business_type=branch.id)
+            pc_out_in_pemusatan_to_branch = Property_to_branch.get_multi('property_stock_account_output_input_main_categ_id', product_category._name, [product_category.id])
+            intercompany_account = pc_out_in_pemusatan_to_branch[product_category.id].id
+            journal = branch.x_studio_intercompany_transaction
+
+            # Define debit/credit position
+            debit = value_line_ids_per_branch[value_line_id_per_branch]['debit']
+            credit = value_line_ids_per_branch[value_line_id_per_branch]['credit']
+            value_ic_branch = debit - credit
+            line_ids = value_line_ids_per_branch[value_line_id_per_branch]['line_ids']
+
+            branch_journal_account_line = []
+            branch_journal_account_line.append((0, 0, {
+                'name': "InterBranch Journal",
+                'quantity': 1,
+                'ref': 'InterBranch Journal',
+                # We switch the position, if the real one is in debit, we need to fill on the credit
+                'debit': value_ic_branch if value_ic_branch < 0 else 0,
+                'credit': value_ic_branch if value_ic_branch >= 0 else 0,
+                'account_id': intercompany_account,
+            }))
+            for line_id in line_ids:
+                branch_journal_account_line.append(line_id)
+            branch_am = self.env['account.move'].with_context(default_journal_id=journal.id).sudo().create({
+                'journal_id': journal.id,
+                'line_ids': branch_journal_account_line,
+                'date': moves.date,
+                'ref': 'InterBranch Payment',
+                'type': 'entry',
+            })
+            # Post the Journal Entries
+            branch_am.action_post()
+            # Reconcile
+            for payment in self:
+                for rec in payment.payment_wizard_line_ids:
+                    for line in branch_am.line_ids.filtered(lambda a: a.name.split(":")[-1] == ' ' + rec.invoice_ids[0].name and a.account_internal_type in ['receivable', 'payable']):
+                        rec.invoice_ids[0].js_assign_outstanding_line(line.id)
 
     payment_wizard_line_ids = fields.One2many(
         'fal.multi.payment.wizard',
@@ -188,6 +316,8 @@ class account_register_payments(models.TransientModel):
         string="Split payments for each invoice", default=True)
     fal_create_batch_payment = fields.Boolean(
         string="Create Batch Payment", default=False)
+    fal_business_type = fields.Many2one('fal.business.type', 'Business Type')
+    extra_lines = fields.One2many("fal.multi.payment.wizard.extra.lines", 'register_payments_id', 'Extra Lines')
 
     def _prepare_payment_moves(self):
         all_move_vals = []
@@ -319,3 +449,16 @@ class fal_multi_payment_wizard(models.TransientModel):
         else:
             action_vals['view_mode'] = 'tree,form'
         return action_vals
+
+
+class fal_multi_payment_wizard_extra_lines(models.TransientModel):
+    _name = "fal.multi.payment.wizard.extra.lines"
+    _description = "Multi Payment Wizard Extra Lines"
+
+    account_id = fields.Many2one('account.account')
+    fal_business_type = fields.Many2one('fal.business.type', related="account_id.fal_business_type")
+    register_payments_id = fields.Many2one(
+        'account.payment.register', 'Payment List')
+    name = fields.Char("Name")
+    debit = fields.Float(string='Debit', default=0.0)
+    credit = fields.Float(string='Credit', default=0.0)
