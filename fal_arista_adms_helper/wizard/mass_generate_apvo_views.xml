@@ -13,8 +13,11 @@
                                 <tree editable="bottom">
                                     <field name="x_studio_adms_id" readonly="1"/>
                                     <field name="partner_id"/>
+                                    <field name="taxes_id" widget="many2many_tags"/>
+                                    <field name="amount_untaxed"/>
+                                    <field name="x_studio_real_value"/>
                                     <field name="x_studio_variance_unit_account"/>
-                                    <field name="x_studio_variance_unit"/>
+                                    <field name="x_studio_variance_unit" readonly="1"/>
                                     <field name="x_studio_variance_expedisi_account" invisible="1"/>
                                     <field name="x_studio_variance_expedisi"/>
                                     <field name="state" invisible="1"/>
@@ -61,8 +64,11 @@
                                 <tree editable="bottom">
                                     <field name="x_studio_adms_id" readonly="1"/>
                                     <field name="partner_id"/>
+                                    <field name="taxes_id" widget="many2many_tags"/>
+                                    <field name="amount_untaxed"/>
+                                    <field name="x_studio_real_value"/>
                                     <field name="x_studio_variance_unit_account"/>
-                                    <field name="x_studio_variance_unit"/>
+                                    <field name="x_studio_variance_unit" readonly="1"/>
                                     <field name="x_studio_variance_expedisi_account" invisible="1"/>
                                     <field name="x_studio_variance_expedisi"/>
                                     <field name="state" invisible="1"/>

@@ -14,6 +14,9 @@ class MassGenerateAPVO(models.TransientModel):
             if purchase_order_id.partner_id.id != self.purchase_order_ids[0].partner_id.id:
                 raise UserError(
                     _('Hanya bisa membuat APVO gabungan untuk vendor yang sama!'))
+            if purchase_order_id.taxes_id:
+                for purchase_line in purchase_order_id.order_line:
+                    purchase_line.taxes_id = [(6, 0, purchase_order_id.taxes_id.ids)]
         sa_mass_APVO = self.env['ir.actions.server'].browse(633)
         ctx = dict(self.env.context or {})
         ctx.update({'active_ids': self.purchase_order_ids.ids, 'active_model': 'purchase.order'})
@@ -31,6 +34,9 @@ class MassGenerateAPVORetur(models.TransientModel):
             if purchase_order_id.partner_id.id != self.purchase_order_ids[0].partner_id.id:
                 raise UserError(
                     _('Hanya bisa membuat APVO Retur gabungan untuk vendor yang sama!'))
+            if purchase_order_id.taxes_id:
+                for purchase_line in purchase_order_id.order_line:
+                    purchase_line.taxes_id = [(6, 0, purchase_order_id.taxes_id.ids)]
         sa_mass_APVO_retur = self.env['ir.actions.server'].browse(639)
         ctx = dict(self.env.context or {})
         ctx.update({'active_ids': self.purchase_order_ids.ids, 'active_model': 'purchase.order'})
