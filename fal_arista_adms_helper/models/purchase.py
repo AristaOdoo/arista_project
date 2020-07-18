@@ -18,15 +18,3 @@ class Purchase(models.Model):
             po.fal_po_value = po_value
 
     fal_po_value = fields.Float("PO Value", compute='_compute_po_value')
-
-    @api.onchange('x_studio_real_value')
-    def _onchange_real_value(self):
-        for po in self:
-            po_value = 0
-            if po.amount_untaxed:
-                po_value = po.amount_untaxed
-            elif po.x_studio_amount_dpp:
-                po_value = po.x_studio_amount_dpp
-            else:
-                po_value = 0
-            po.x_studio_variance_unit = po.x_studio_real_value - po_value
