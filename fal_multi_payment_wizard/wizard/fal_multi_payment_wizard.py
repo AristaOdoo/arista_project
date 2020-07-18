@@ -176,6 +176,8 @@ class account_register_payments(models.TransientModel):
         AccountMove = self.env['account.move'].with_context(default_type='entry')
         # In Arista, they can add more lines on register payment
         # But if the line account is the same, we need to combine (Logically only 1)
+        # We also need to know the total extra line value, if it's not 0, we need to modify the journal line value
+        extra_line_value = 0
         for extra_line in self.extra_lines:
             same_account_found = False
             for payment_move in payment_moves['line_ids']:
@@ -188,8 +190,16 @@ class account_register_payments(models.TransientModel):
                     'name': extra_line.name,
                     'debit': extra_line.debit,
                     'credit': extra_line.credit,
+                    'partner_id': extra_line.partner_id.id,
                     'account_id': extra_line.account_id.id,
                 }))
+            extra_line_value += extra_line.debit - extra_line.credit
+        for payment_move in payment_moves['line_ids']:
+            if payment_move[2]['account_id'] == self.journal_id.default_debit_account_id.id:
+                if extra_line_value < 0:
+                    payment_move[2]['debit'] = payment_move[2]['debit'] + extra_line_value
+                else:
+                    payment_move[2]['credit'] = payment_move[2]['credit'] + extra_line_value
         moves = AccountMove.create(payment_moves)
         # In Arista there is a condition that Head Office pay for other branch purchases.
         # So, we need construct the data per branch
@@ -244,16 +254,20 @@ class account_register_payments(models.TransientModel):
         intercompany_account = pc_out_in_pemusatan_to_branch[product_category.id].id
 
         # Change initial journal to interbranch first
-        ic_value = total_debit_other_branch - total_credit_other_branch
+        # Interbranch line are created for each branch
         main_journal_change = []
-        main_journal_change.append((0, 0, {
-            'name': "InterBranch Journal",
-            'quantity': 1,
-            'ref': 'InterBranch Journal',
-            'debit': ic_value if ic_value > 0 else 0,
-            'credit': ic_value if ic_value <= 0 else 0,
-            'account_id': intercompany_account,
-        }))
+        for value_line_id_per_branch in value_line_ids_per_branch:
+            ic_value = value_line_ids_per_branch[value_line_id_per_branch]['debit'] - value_line_ids_per_branch[value_line_id_per_branch]['credit']
+            branch = self.env['fal.business.type'].browse(value_line_id_per_branch)
+            main_journal_change.append((0, 0, {
+                'name': "InterBranch Journal",
+                'quantity': 1,
+                'ref': 'InterBranch Journal',
+                'debit': ic_value if ic_value > 0 else 0,
+                'credit': ic_value if ic_value <= 0 else 0,
+                'account_id': intercompany_account,
+                'partner_id': branch.partner_id.id
+            }))
         for main_entries_line_to_delete_id in main_entries_line_to_delete:
             main_journal_change.append((2, main_entries_line_to_delete_id))
         # Apply new line to move
@@ -459,6 +473,7 @@ class fal_multi_payment_wizard_extra_lines(models.TransientModel):
     fal_business_type = fields.Many2one('fal.business.type', related="account_id.fal_business_type")
     register_payments_id = fields.Many2one(
         'account.payment.register', 'Payment List')
+    partner_id = fields.Many2one('res.partner')
     name = fields.Char("Name")
     debit = fields.Float(string='Debit', default=0.0)
     credit = fields.Float(string='Credit', default=0.0)

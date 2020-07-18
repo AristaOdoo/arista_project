@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import api, fields, models, SUPERUSER_ID, _
 from odoo.exceptions import UserError
+from num2words import num2words
 
 
 class AccountMove(models.Model):
@@ -76,3 +77,6 @@ class AccountMove(models.Model):
         lines = self.env['account.move.line'].browse(line_id)
         lines += self.line_ids.filtered(lambda line: line.account_id == lines[0].account_id and line.partner_id == lines[0].partner_id and not line.reconciled)
         return lines.reconcile()
+
+    def num_to_words_id(self, value):
+        return num2words(value, lang="id")
