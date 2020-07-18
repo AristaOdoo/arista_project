@@ -32,7 +32,7 @@ ADMS / Arista have special request to just call one method to know:
     'data': [
         'security/ir.model.access.csv',
         'views/fal_cust_vendor_group_views.xml',
-        'wizard/mass_generate_apvo_views.xml'
+        'views/mass_generate_apvo_views.xml'
     ],
     'images': [
     ],

@@ -11,3 +11,4 @@ from . import fal_no_rangka
 from . import fal_product_dimension
 from . import product
 from . import sale
+from . import mass_generate_apvo
