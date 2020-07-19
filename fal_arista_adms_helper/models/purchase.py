@@ -7,8 +7,8 @@ class Purchase(models.Model):
 
     def _compute_po_value(self):
         for po in self:
+            po_value = 0
             if po.amount_untaxed:
-                po_value = 0
                 if po.amount_untaxed:
                     po_value = po.amount_untaxed
                 elif po.x_studio_amount_dpp:

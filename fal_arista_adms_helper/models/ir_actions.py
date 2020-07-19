@@ -203,13 +203,27 @@ class IrActionsServer(models.Model):
                 result['id_apvo_retur'] = real_id.x_studio_journal_apvo_retur and real_id.x_studio_journal_apvo_retur.id or 0
                 result['apvo_retur'] = real_id.x_studio_journal_apvo_retur and real_id.x_studio_journal_apvo_retur.name or ''
                 return result
-            if operation in [632]:
+            if operation in [629]:
                 result['isSuccess'] = True
                 result['id_record'] = real_id.id or 0
-                result['id_invoice_journal_cancel'] = real_id.x_studio_invoice_journal_cancel and real_id.x_studio_invoice_journal_cancel.id or 0
-                result['invoice_journal_cancel'] = real_id.x_studio_invoice_journal_cancel and real_id.x_studio_invoice_journal_cancel.name or ''
-                result['id_issue_journal_cancel'] = real_id.x_studio_issue_journal_cancel and real_id.x_studio_issue_journal_cancel.id or 0
-                result['issue_journal_cancel'] = real_id.x_studio_issue_journal_cancel and real_id.x_studio_issue_journal_cancel.name or ''
+                # For Recalculate payment, we do the logic here
+                if real_id:
+                    # For total DP we find spk payment that is related to this sale order
+                    total_dp = 0
+                    spk_pay_list = self.env['x_spk_payment'].sudo().search([('x_studio_nospk', '=', real_id.id)])
+                    for spk_pay in spk_pay_list.filtered(lambda x: x.x_studio_paymtype in ['1', '2'] and (not x.x_studio_bon_hijau) and x.x_studio_bon_merah):
+                        # Bank Journal Account
+                        account_id = spk_pay.x_studio_bon_merah.journal_id.default_debit_account_id
+                        if not account_id:
+                            account_id = spk_pay.x_studio_bon_merah.journal_id.default_credit_account_id
+                        for move_line in spk_pay.x_studio_bon_merah.line_ids:
+                            if move_line.account_id.id == account_id.id:
+                                total_dp += move_line.debit + move_line.credit
+                    result['total_dp'] = total_dp
+                    total_pay = 0
+                    for invoice in real_id.invoice_ids:
+                        total_pay += (invoice.amount_residual - (invoice.amount_total + invoice.x_studio_discount)) * -1
+                    result['total_pay'] = total_pay
                 return result
         result['isSuccess'] = False
         result['ErrorMsg'] = 'Share ID & Branch is required'
