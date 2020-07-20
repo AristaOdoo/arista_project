@@ -72,8 +72,8 @@ class IrActionsServer(models.Model):
             'apvo': '',
             'id_apvo_retur': 0,
             'apvo_retur': '',
-            'total_dp': 0,
-            'total_pay': 0,
+            'total_dp': 0.0,
+            'total_pay': 0.0,
         }
         if adms_id and fal_business_type:
             # Action Info
