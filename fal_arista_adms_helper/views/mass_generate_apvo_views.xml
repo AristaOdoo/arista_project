@@ -31,14 +31,14 @@
                         </h1>
                         <group>
                             <group>
-                                <field name="partner_id" required="1" domain="[('supplier_rank','>',0)]"/>
+                                <field name="partner_id" required="1" domain="[('supplier_rank','>',0), ('fal_business_type','=',fal_business_type)]"/>
                                 <field name="date" required="1"/>
                                 <field name="apvo_type" required="1"/>
                                 <field name="text"/>
                             </group>
                             <group>
-                                <field name="taxes_id"/>
-                                <field name="account_id"/>
+                                <field name="taxes_id" domain="[('fal_business_type','=',fal_business_type), ('type_tax_use','=','purchase')]"/>
+                                <field name="account_id" domain="[('fal_business_type','=',fal_business_type)]"/>
                                 <field name="used" readonly="1"/>
                                 <field name="fal_business_type" readonly="1"/>
                             </group>
