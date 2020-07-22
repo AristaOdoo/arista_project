@@ -209,7 +209,7 @@ class IrActionsServer(models.Model):
                 # For Recalculate payment, we do the logic here
                 if real_id:
                     # For total DP we find spk payment that is related to this sale order
-                    total_dp = 0
+                    total_dp = 0.0
                     spk_pay_list = self.env['x_spk_payment'].sudo().search([('x_studio_nospk', '=', real_id.id)])
                     for spk_pay in spk_pay_list.filtered(lambda x: x.x_studio_paymtype in ['1', '2'] and (not x.x_studio_bon_hijau) and x.x_studio_bon_merah):
                         # Bank Journal Account
@@ -220,7 +220,7 @@ class IrActionsServer(models.Model):
                             if move_line.account_id.id == account_id.id:
                                 total_dp += move_line.debit + move_line.credit
                     result['total_dp'] = total_dp
-                    total_pay = 0
+                    total_pay = 0.0
                     for invoice in real_id.invoice_ids:
                         total_pay += (invoice.amount_residual - (invoice.amount_total + invoice.x_studio_discount)) * -1
                     result['total_pay'] = total_pay
