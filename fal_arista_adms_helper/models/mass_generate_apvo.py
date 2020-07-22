@@ -41,12 +41,12 @@ class MassGenerateAPVOModel(models.Model):
         if self.apvo_type == '1':
             sa_mass_APVO = self.env['ir.actions.server'].browse(633)
             ctx = dict(self.env.context or {})
-            ctx.update({'text': self.text, 'date': self.date, 'active_ids': self.purchase_order_ids.ids, 'active_model': 'purchase.order'})
+            ctx.update({'mapvo_adms_id': self.mass_apvo_sequence or '', 'text': self.text or '', 'date': self.date, 'active_ids': self.purchase_order_ids.ids, 'active_model': 'purchase.order'})
             sa_mass_APVO.with_context(ctx).run()
         else:
             sa_mass_APVO_retur = self.env['ir.actions.server'].browse(639)
             ctx = dict(self.env.context or {})
-            ctx.update({'text': self.text, 'date': self.date, 'active_ids': self.purchase_order_ids.ids, 'active_model': 'purchase.order'})
+            ctx.update({'mapvo_adms_id': self.mass_apvo_sequence or '', 'text': self.text or '', 'date': self.date, 'active_ids': self.purchase_order_ids.ids, 'active_model': 'purchase.order'})
             sa_mass_APVO_retur.with_context(ctx).run()
         self.used = True
 
