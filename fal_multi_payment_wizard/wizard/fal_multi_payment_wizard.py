@@ -193,14 +193,16 @@ class account_register_payments(models.TransientModel):
                     'partner_id': extra_line.partner_id.id,
                     'account_id': extra_line.account_id.id,
                 }))
-            extra_line_value += extra_line.debit - extra_line.credit
+            if self.payment_method_id.payment_type == 'inbound':
+                extra_line_value += extra_line.credit - extra_line.debit
+            else:
+                extra_line_value += extra_line.debit - extra_line.credit
         for payment_move in payment_moves['line_ids']:
             if payment_move[2]['account_id'] == self.journal_id.default_debit_account_id.id:
                 if payment_move[2]['debit'] > 0:
                     payment_move[2]['debit'] = payment_move[2]['debit'] + extra_line_value
                 else:
                     payment_move[2]['credit'] = payment_move[2]['credit'] + extra_line_value
-        print(payment_moves)
         moves = AccountMove.create(payment_moves)
         # In Arista there is a condition that Head Office pay for other branch purchases.
         # So, we need construct the data per branch
@@ -265,7 +267,7 @@ class account_register_payments(models.TransientModel):
                 'quantity': 1,
                 'ref': 'InterBranch Journal',
                 'debit': ic_value if ic_value > 0 else 0,
-                'credit': ic_value if ic_value <= 0 else 0,
+                'credit': -1 * ic_value if ic_value <= 0 else 0,
                 'account_id': intercompany_account,
                 'partner_id': branch.partner_id.id
             }))
@@ -303,7 +305,7 @@ class account_register_payments(models.TransientModel):
                 'quantity': 1,
                 'ref': 'InterBranch Journal',
                 # We switch the position, if the real one is in debit, we need to fill on the credit
-                'debit': value_ic_branch if value_ic_branch < 0 else 0,
+                'debit': -1*value_ic_branch if value_ic_branch < 0 else 0,
                 'credit': value_ic_branch if value_ic_branch >= 0 else 0,
                 'account_id': intercompany_account,
             }))
