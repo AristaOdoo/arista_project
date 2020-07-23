@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="account_payment_register_model_tree_falmultipaymentwizard" model="ir.ui.view">
+        <field name="name">account.payment.register.model.tree.falmultipaymentwizard</field>
+        <field name="type">tree</field>
+        <field name="model">account.payment.register.model</field>
+        <field name="arch" type="xml">
+            <tree string="Register Payment">
+                <field name="id"/>
+                <field name="payment_type"/>
+                <field name="fal_business_type"/>
+                <field name="payment_date"/>
+                <field name="journal_id" string="Journal Selection"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="account_payment_register_model_form_out_falmultipaymentwizard" model="ir.ui.view">
+        <field name="name">account.payment.register.model.out.falmultipaymentwizard</field>
+        <field name="type">form</field>
+        <field name="model">account.payment.register.model</field>
+        <field name="arch" type="xml">
+            <form string="Register Payment">
+                <header>
+                    <button name="register_payment" states="draft" string="Post Payment" type="object" class="oe_highlight"/>
+                    <field name="state" widget="statusbar" nolabel="1" />
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="payment_type" widget="radio" readonly="1" force_save="1"/>
+                            <field name="payment_method_id" widget="radio" invisible="1"/>
+                            <field name="group_payment" invisible="1"/>
+                            <field name="fal_split_multi_payment" attrs="{'invisible': 1}"/>
+                            <field name="fal_create_batch_payment" invisible="1"/>
+                            <field name="fal_business_type" attrs="{'readonly': [('state', '=', 'post')]}"/>
+                            <field name="company_id" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="journal_id" options="{'no_create': True}" domain="[('type', 'in', ['bank', 'cash']), ('fal_business_type', '=', fal_business_type)]" attrs="{'readonly': [('state', '=', 'post')]}"/>
+                            <field name="payment_date" attrs="{'readonly': [('state', '=', 'post')]}"/>
+                        </group>
+                        <field name="invoice_ids" options="{'no_create': True}" domain="[('state', 'in', ['posted']), ('company_id', '=', company_id), ('type', 'in', ['in_invoice', 'out_refund']), ('invoice_payment_state', 'not in', ['paid'])]" context="{'tree_view_ref': 'account.view_invoice_tree', 'default_type': 'out_invoice'}" attrs="{'readonly': [('state', '=', 'post')]}">
+                            <tree>
+                                <field name="name"/>
+                                <field name="invoice_partner_display_name"/>
+                                <field name="invoice_date"/>
+                                <field name="invoice_origin"/>
+                                <field name="fal_business_type"/>
+                                <field name="amount_untaxed_signed" sum="Total"/>
+                                <field name="amount_total_signed" sum="Total"/>
+                                <field name="amount_residual_signed" sum="Total"/>
+                                <field name="state" invisible="1"/>
+                            </tree>
+                        </field>
+                        <field name="payment_wizard_line_ids" attrs="{'invisible': [('fal_split_multi_payment', '=', False)], 'readonly': [('state', '=', 'post')]}">
+                            <tree string="Payment Wizard Line" editable="bottom" create="false">
+                                <field name="payment_type" invisible="1"/>
+                                <field name="partner_type" invisible="1"/>
+                                <field name="partner_id" readonly="1" force_save="1"/>
+                                <field name="invoice_ids" invisible="1"/>
+                                <field name="fal_number" readonly="1" force_save="1"/>
+                                <field name="journal_id" string="Journal Selection" readonly="1" force_save="1"/>
+                                <field name="payment_method_id" invisible="1"/>
+                                <field name="payment_date" readonly="1" force_save="1"/>
+                                <field name="communication"/>
+                                <field name="amount" sum="Total"/>
+                                <field name="currency_id" invisible="1"/>
+                            </tree>
+                        </field>
+                        <separator string="Extra Lines"/>
+                        <field name="extra_lines" attrs="{'readonly': [('state', '=', 'post')]}">
+                            <tree string="Extra Payment Wizard Line" editable="bottom">
+                                <field name="fal_business_type"/>
+                                <field name="account_id"/>
+                                <field name="partner_id"/>
+                                <field name="name" required="1"/>
+                                <field name="debit" sum="Total"/>
+                                <field name="credit" sum="Total"/>
+                            </tree>
+                        </field>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="account_payment_register_model_form_in_falmultipaymentwizard" model="ir.ui.view">
+        <field name="name">account.payment.register.model.in.falmultipaymentwizard</field>
+        <field name="type">form</field>
+        <field name="model">account.payment.register.model</field>
+        <field name="arch" type="xml">
+            <form string="Register Payment">
+                <header>
+                    <button name="register_payment" states="draft" string="Post Payment" type="object" class="oe_highlight"/>
+                    <field name="state" widget="statusbar" nolabel="1" />
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="payment_type" widget="radio" readonly="1" force_save="1"/>
+                            <field name="payment_method_id" widget="radio" invisible="1"/>
+                            <field name="group_payment" invisible="1"/>
+                            <field name="fal_split_multi_payment" attrs="{'invisible': 1}"/>
+                            <field name="fal_create_batch_payment" invisible="1"/>
+                            <field name="fal_business_type" attrs="{'readonly': [('state', '=', 'post')]}"/>
+                            <field name="company_id" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="journal_id" options="{'no_create': True}" domain="[('type', 'in', ['bank', 'cash']), ('fal_business_type', '=', fal_business_type)]" attrs="{'readonly': [('state', '=', 'post')]}"/>
+                            <field name="payment_date" attrs="{'readonly': [('state', '=', 'post')]}"/>
+                        </group>
+                        <field name="invoice_ids" options="{'no_create': True}" domain="[('state', 'in', ['posted']), ('company_id', '=', company_id), ('type', 'in', ['out_invoice', 'in_refund']), ('invoice_payment_state', 'not in', ['paid'])]" context="{'tree_view_ref': 'account.view_invoice_tree', 'default_type': 'in_invoice'}" attrs="{'readonly': [('state', '=', 'post')]}">
+                            <tree>
+                                <field name="name"/>
+                                <field name="invoice_partner_display_name"/>
+                                <field name="invoice_date"/>
+                                <field name="invoice_origin"/>
+                                <field name="fal_business_type"/>
+                                <field name="amount_untaxed_signed"/>
+                                <field name="amount_total_signed"/>
+                                <field name="amount_residual_signed"/>
+                                <field name="state" invisible="1"/>
+                            </tree>
+                        </field>
+                        <field name="payment_wizard_line_ids" attrs="{'invisible': [('fal_split_multi_payment', '=', False)], 'readonly': [('state', '=', 'post')]}">
+                            <tree string="Payment Wizard Line" editable="bottom" create="false">
+                                <field name="payment_type" invisible="1"/>
+                                <field name="partner_type" invisible="1"/>
+                                <field name="partner_id" readonly="1" force_save="1"/>
+                                <field name="invoice_ids" invisible="1"/>
+                                <field name="fal_number" readonly="1" force_save="1"/>
+                                <field name="journal_id" string="Journal Selection" readonly="1" force_save="1"/>
+                                <field name="payment_method_id" invisible="1"/>
+                                <field name="payment_date" readonly="1" force_save="1"/>
+                                <field name="communication"/>
+                                <field name="amount"/>
+                                <field name="currency_id" invisible="1"/>
+                            </tree>
+                        </field>
+                        <separator string="Extra Lines"/>
+                        <field name="extra_lines" attrs="{'readonly': [('state', '=', 'post')]}">
+                            <tree string="Extra Payment Wizard Line" editable="bottom">
+                                <field name="fal_business_type"/>
+                                <field name="account_id"/>
+                                <field name="partner_id"/>
+                                <field name="name" required="1"/>
+                                <field name="debit"/>
+                                <field name="credit"/>
+                            </tree>
+                        </field>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_account_payment_register_model_out_falmultipaymentwizard" model="ir.actions.act_window">
+        <field name="name">Out Account Register Payment</field>
+        <field name="res_model">account.payment.register.model</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('payment_type', '=', 'out')]</field>
+        <field name="context">{'default_payment_type':'out'}</field>
+        <field name="view_ids"
+                 eval="[(5, 0, 0),
+                        (0, 0, {'view_mode': 'tree', 'view_id': ref('fal_multi_payment_wizard.account_payment_register_model_tree_falmultipaymentwizard')}),
+                        (0, 0, {'view_mode': 'form', 'view_id': ref('fal_multi_payment_wizard.account_payment_register_model_form_out_falmultipaymentwizard')})]"/>
+        <field name="help" type="html">
+          <p class="oe_view_nocontent_create">
+            Click to start a new Out Payment Register.
+          </p>
+        </field>
+    </record>
+    <menuitem id="menu_action_account_payment_register_model_out_falmultipaymentwizard" action="action_account_payment_register_model_out_falmultipaymentwizard" parent="account.menu_finance_payables"/>
+
+    <record id="action_account_payment_register_model_in_falmultipaymentwizard" model="ir.actions.act_window">
+        <field name="name">In Account Register Payment</field>
+        <field name="res_model">account.payment.register.model</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('payment_type', '=', 'in')]</field>
+        <field name="context">{'default_payment_type':'in'}</field>
+        <field name="view_ids"
+                 eval="[(5, 0, 0),
+                        (0, 0, {'view_mode': 'tree', 'view_id': ref('fal_multi_payment_wizard.account_payment_register_model_tree_falmultipaymentwizard')}),
+                        (0, 0, {'view_mode': 'form', 'view_id': ref('fal_multi_payment_wizard.account_payment_register_model_form_in_falmultipaymentwizard')})]"/>
+        <field name="help" type="html">
+          <p class="oe_view_nocontent_create">
+            Click to start a new In Payment Register.
+          </p>
+        </field>
+    </record>
+    <menuitem id="menu_action_account_payment_register_model_in_falmultipaymentwizard" action="action_account_payment_register_model_in_falmultipaymentwizard" parent="account.menu_finance_receivables"/>
+</odoo>
