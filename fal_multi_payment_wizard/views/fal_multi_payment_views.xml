@@ -23,7 +23,7 @@
             <form string="Register Payment">
                 <header>
                     <button name="register_payment" states="draft" string="Post Payment" type="object" class="oe_highlight"/>
-                    <field name="state" widget="statusbar" nolabel="1" />
+                    <field name="state" widget="statusbar" nolabel="1" readonly="1"/>
                 </header>
                 <sheet>
                     <group>
@@ -33,7 +33,7 @@
                             <field name="group_payment" invisible="1"/>
                             <field name="fal_split_multi_payment" attrs="{'invisible': 1}"/>
                             <field name="fal_create_batch_payment" invisible="1"/>
-                            <field name="fal_business_type" attrs="{'readonly': [('state', '=', 'post')]}"/>
+                            <field name="fal_business_type" attrs="{'readonly': [('state', '=', 'post')]}" readonly="1" force_save="1"/>
                             <field name="company_id" invisible="1"/>
                         </group>
                         <group>
@@ -71,8 +71,9 @@
                         <separator string="Extra Lines"/>
                         <field name="extra_lines" attrs="{'readonly': [('state', '=', 'post')]}">
                             <tree string="Extra Payment Wizard Line" editable="bottom">
+                                <field name="company_id" invisible="1"/>
                                 <field name="fal_business_type"/>
-                                <field name="account_id"/>
+                                <field name="account_id" domain="[('company_id', '=', parent.company_id)]"/>
                                 <field name="partner_id"/>
                                 <field name="name" required="1"/>
                                 <field name="debit" sum="Total"/>
@@ -93,7 +94,7 @@
             <form string="Register Payment">
                 <header>
                     <button name="register_payment" states="draft" string="Post Payment" type="object" class="oe_highlight"/>
-                    <field name="state" widget="statusbar" nolabel="1" />
+                    <field name="state" widget="statusbar" nolabel="1" readonly="1"/>
                 </header>
                 <sheet>
                     <group>
@@ -103,7 +104,7 @@
                             <field name="group_payment" invisible="1"/>
                             <field name="fal_split_multi_payment" attrs="{'invisible': 1}"/>
                             <field name="fal_create_batch_payment" invisible="1"/>
-                            <field name="fal_business_type" attrs="{'readonly': [('state', '=', 'post')]}"/>
+                            <field name="fal_business_type" attrs="{'readonly': [('state', '=', 'post')]}" readonly="1" force_save="1"/>
                             <field name="company_id" invisible="1"/>
                         </group>
                         <group>
@@ -141,8 +142,9 @@
                         <separator string="Extra Lines"/>
                         <field name="extra_lines" attrs="{'readonly': [('state', '=', 'post')]}">
                             <tree string="Extra Payment Wizard Line" editable="bottom">
+                                <field name="company_id" invisible="1"/>
                                 <field name="fal_business_type"/>
-                                <field name="account_id"/>
+                                <field name="account_id" domain="[('company_id', '=', parent.company_id)]"/>
                                 <field name="partner_id"/>
                                 <field name="name" required="1"/>
                                 <field name="debit"/>

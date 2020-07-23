@@ -20,7 +20,7 @@ class MassGenerateAPVOModel(models.Model):
         ('1', 'Receipt'),
         ('2', 'Retur'),
     ])
-    state = fields.Selection([('draft', 'Draft'), ('post', 'Posted')], default="draft", readonly=True)
+    state = fields.Selection([('draft', 'Draft'), ('post', 'Posted')], default="draft")
     text = fields.Text("Text")
     account_id = fields.Many2one("account.account", required=True)
     used = fields.Boolean("Has been Used")

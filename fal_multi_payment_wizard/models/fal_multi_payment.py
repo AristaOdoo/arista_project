@@ -105,6 +105,8 @@ class payment_register(models.Model):
                 rec['payment_type'] = self._context.get('default_payment_type')
             else:
                 rec['payment_type'] = 'in'
+        if 'state' not in rec:
+            rec['state'] = 'draft'
 
         user_id = self.env['res.users'].browse(self.env.uid)
         rec['fal_business_type'] = user_id.fal_business_type_id and user_id.fal_business_type_id.id or False
@@ -124,7 +126,7 @@ class payment_register(models.Model):
     fal_business_type = fields.Many2one('fal.business.type', 'Business Type')
     company_id = fields.Many2one('res.company', 'Company', related="fal_business_type.company_id")
     extra_lines = fields.One2many("fal.multi.payment.wizard.extra.lines.model", 'register_payments_id', 'Extra Lines')
-    state = fields.Selection([('draft', 'Draft'), ('post', 'Posted')], default="draft", readonly=True)
+    state = fields.Selection([('draft', 'Draft'), ('post', 'Posted')], default="draft")
 
     @api.onchange('fal_business_type')
     def _onchange_fal_business_type(self):
@@ -244,6 +246,7 @@ class fal_multi_payment_wizard_extra_lines(models.Model):
     _description = "Multi Payment Wizard Extra Lines"
 
     account_id = fields.Many2one('account.account', required=True)
+    company_id = fields.Many2one('res.company', 'Company', related="register_payments_id.company_id")
     fal_business_type = fields.Many2one('fal.business.type', related="account_id.fal_business_type")
     register_payments_id = fields.Many2one(
         'account.payment.register.model', 'Payment List')
