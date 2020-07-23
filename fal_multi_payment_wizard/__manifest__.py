@@ -19,8 +19,10 @@
         'account_batch_payment',
     ],
     'data': [
+        'security/ir.model.access.csv',
         'wizard/fal_multi_payment_wizard_view.xml',
         'views/account_invoice.xml',
+        'views/fal_multi_payment_views.xml',
     ],
     'images': [
         'static/description/multi_payment_screenshot.png'

@@ -7,10 +7,12 @@
             <field name="model">mass.generate.apvo.model</field>
             <field name="arch" type="xml">
                 <tree string="Mass Generate APVO">
+                    <field name="id"/>
                     <field name="partner_id"/>
                     <field name="date"/>
                     <field name="mass_apvo_sequence"/>
                     <field name="apvo_type"/>
+                    <field name="taxes_id"/>
                     <field name="text"/>
                     <field name="account_id"/>
                 </tree>
@@ -23,7 +25,8 @@
             <field name="arch" type="xml">
                 <form string="Mass Generate APVO">
                     <header>
-                        <button name="call_mass_apvo" string="Generate APVO" type="object" class="oe_highlight" attrs="{'invisible': [('used', '=', True)]}"/>
+                        <button name="call_mass_apvo" string="Generate APVO" type="object" class="oe_highlight" attrs="{'invisible': [('state', '=', 'post')]}"/>
+                        <field name="state" widget="statusbar" nolabel="1" />
                     </header>
                     <sheet>
                         <h1>
@@ -31,25 +34,25 @@
                         </h1>
                         <group>
                             <group>
-                                <field name="partner_id" required="1" domain="[('supplier_rank','>',0), ('fal_business_type','=',fal_business_type)]"/>
-                                <field name="date" required="1"/>
-                                <field name="apvo_type" required="1"/>
-                                <field name="text"/>
+                                <field name="partner_id" required="1" domain="[('supplier_rank','>',0), ('fal_business_type','=',fal_business_type)]" attrs="{'readonly': [('state', '=', 'post')]}"/>
+                                <field name="date" required="1" attrs="{'readonly': [('state', '=', 'post')]}"/>
+                                <field name="apvo_type" required="1" attrs="{'readonly': [('state', '=', 'post')]}"/>
+                                <field name="text" attrs="{'readonly': [('state', '=', 'post')]}"/>
                             </group>
                             <group>
-                                <field name="taxes_id" domain="[('fal_business_type','=',fal_business_type), ('type_tax_use','=','purchase')]"/>
-                                <field name="account_id" domain="[('fal_business_type','=',fal_business_type)]"/>
-                                <field name="used" readonly="1"/>
+                                <field name="taxes_id" domain="[('fal_business_type','=',fal_business_type), ('type_tax_use','=','purchase')]" attrs="{'readonly': [('state', '=', 'post')]}"/>
+                                <field name="account_id" domain="[('fal_business_type','=',fal_business_type)]" attrs="{'readonly': [('state', '=', 'post')]}"/>
+                                <field name="used" invisible="1"/>
                                 <field name="fal_business_type" readonly="1"/>
                             </group>
                         </group>
                         <notebook>
                             <page string="Purchase Orders">
-                                <field name="purchase_order_ids" domain="[('state','=','draft'), ('x_studio_reciept_type','=', apvo_type), ('x_studio_journal_apvo','=', False), ('partner_id', '=', partner_id)]" options="{'no_create': True}">
+                                <field name="purchase_order_ids" domain="[('state','=','draft'), ('x_studio_reciept_type','=', apvo_type), ('x_studio_journal_apvo','=', False), ('partner_id', '=', partner_id)]" options="{'no_create': True}" attrs="{'readonly': [('state', '=', 'post')]}">
                                     <tree editable="bottom">
                                         <field name="x_studio_adms_id" readonly="1"/>
                                         <field name="partner_id" readonly="1"/>
-                                        <field name="x_studio_real_value"/>
+                                        <field name="x_studio_real_value" required="1"/>
                                         <field name="fal_po_value"/>
                                         <field name="x_studio_variance_unit_account" invisible="1"/>
                                         <field name="x_studio_variance_unit" readonly="1"/>

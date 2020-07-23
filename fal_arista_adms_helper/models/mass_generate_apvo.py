@@ -20,6 +20,7 @@ class MassGenerateAPVOModel(models.Model):
         ('1', 'Receipt'),
         ('2', 'Retur'),
     ])
+    state = fields.Selection([('draft', 'Draft'), ('post', 'Posted')], default="draft", readonly=True)
     text = fields.Text("Text")
     account_id = fields.Many2one("account.account", required=True)
     used = fields.Boolean("Has been Used")
@@ -49,6 +50,7 @@ class MassGenerateAPVOModel(models.Model):
             ctx.update({'mapvo_adms_id': self.mass_apvo_sequence or '', 'text': self.text or '', 'date': self.date, 'active_ids': self.purchase_order_ids.ids, 'active_model': 'purchase.order'})
             sa_mass_APVO_retur.with_context(ctx).run()
         self.used = True
+        self.state = 'post'
 
     @api.model
     def create(self, vals):

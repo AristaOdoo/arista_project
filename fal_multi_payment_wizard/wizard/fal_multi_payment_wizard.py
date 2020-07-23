@@ -196,10 +196,11 @@ class account_register_payments(models.TransientModel):
             extra_line_value += extra_line.debit - extra_line.credit
         for payment_move in payment_moves['line_ids']:
             if payment_move[2]['account_id'] == self.journal_id.default_debit_account_id.id:
-                if extra_line_value < 0:
+                if payment_move[2]['debit'] > 0:
                     payment_move[2]['debit'] = payment_move[2]['debit'] + extra_line_value
                 else:
                     payment_move[2]['credit'] = payment_move[2]['credit'] + extra_line_value
+        print(payment_moves)
         moves = AccountMove.create(payment_moves)
         # In Arista there is a condition that Head Office pay for other branch purchases.
         # So, we need construct the data per branch
@@ -469,7 +470,7 @@ class fal_multi_payment_wizard_extra_lines(models.TransientModel):
     _name = "fal.multi.payment.wizard.extra.lines"
     _description = "Multi Payment Wizard Extra Lines"
 
-    account_id = fields.Many2one('account.account')
+    account_id = fields.Many2one('account.account', required=True)
     fal_business_type = fields.Many2one('fal.business.type', related="account_id.fal_business_type")
     register_payments_id = fields.Many2one(
         'account.payment.register', 'Payment List')

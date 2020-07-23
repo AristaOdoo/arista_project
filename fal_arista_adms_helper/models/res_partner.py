@@ -62,8 +62,8 @@ class ResPartner(models.Model):
                       {where} ({email} {operator} {percent}
                            OR {display_name} {operator} {percent}
                            OR {reference} {operator} {percent}
-                           OR {vat} {operator} {percent}
-                           OR {x_studio_adms_id} {operator} {percent})
+                           OR {x_studio_adms_id} {operator} {percent}
+                           OR {vat} {operator} {percent})
                            -- don't panic, trust postgres bitmap
                      ORDER BY {fields} {display_name} {operator} {percent} desc,
                               {display_name}
@@ -78,7 +78,6 @@ class ResPartner(models.Model):
                                percent=unaccent('%s'),
                                vat=unaccent('res_partner.vat'),
                                )
-
             where_clause_params += [search_name]*4 # for email / display_name, reference
             where_clause_params += [re.sub('[^a-zA-Z0-9]+', '', search_name) or None]  # for vat
             where_clause_params += [search_name]  # for order by
