@@ -204,6 +204,10 @@ class account_register_payments(models.TransientModel):
                 else:
                     payment_move[2]['credit'] = payment_move[2]['credit'] + extra_line_value
         moves = AccountMove.create(payment_moves)
+        if self.env.context.get('aprm_id', False):
+            self.env['account.payment.register.model'].browse(self.env.context.get('aprm_id', False)).write({
+                'bon_id': moves.id,
+            })
         # In Arista there is a condition that Head Office pay for other branch purchases.
         # So, we need construct the data per branch
         value_line_ids_per_branch = {}
@@ -305,7 +309,7 @@ class account_register_payments(models.TransientModel):
                 'quantity': 1,
                 'ref': 'InterBranch Journal',
                 # We switch the position, if the real one is in debit, we need to fill on the credit
-                'debit': -1*value_ic_branch if value_ic_branch < 0 else 0,
+                'debit': -1 * value_ic_branch if value_ic_branch < 0 else 0,
                 'credit': value_ic_branch if value_ic_branch >= 0 else 0,
                 'account_id': intercompany_account,
             }))
