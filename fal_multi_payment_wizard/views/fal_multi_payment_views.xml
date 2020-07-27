@@ -9,8 +9,13 @@
                 <field name="id"/>
                 <field name="payment_type"/>
                 <field name="fal_business_type"/>
+                <field name="partner_name"/>
                 <field name="payment_date"/>
                 <field name="journal_id" string="Journal Selection"/>
+                <field name="bon_id"/>
+                <field name="nomor_bon"/>
+                <field name="total_payment"/>
+                <field name="state"/>
             </tree>
         </field>
     </record>
@@ -35,10 +40,14 @@
                             <field name="fal_create_batch_payment" invisible="1"/>
                             <field name="fal_business_type" attrs="{'readonly': [('state', '=', 'post')]}" readonly="1" force_save="1"/>
                             <field name="company_id" invisible="1"/>
+                            <field name="forbidden_account" invisible="1"/>
                         </group>
                         <group>
                             <field name="journal_id" options="{'no_create': True}" domain="[('type', 'in', ['bank', 'cash']), ('fal_business_type', '=', fal_business_type)]" attrs="{'readonly': [('state', '=', 'post')]}"/>
+                            <field name="total_payment"/>
                             <field name="payment_date" attrs="{'readonly': [('state', '=', 'post')]}"/>
+                            <field name="bon_id"/>
+                            <field name="nomor_bon"/>
                         </group>
                         <field name="invoice_ids" options="{'no_create': True}" domain="[('state', 'in', ['posted']), ('company_id', '=', company_id), ('type', 'in', ['in_invoice', 'out_refund']), ('invoice_payment_state', 'not in', ['paid'])]" context="{'tree_view_ref': 'account.view_invoice_tree', 'default_type': 'out_invoice'}" attrs="{'readonly': [('state', '=', 'post')]}">
                             <tree>
@@ -73,7 +82,7 @@
                             <tree string="Extra Payment Wizard Line" editable="bottom">
                                 <field name="company_id" invisible="1"/>
                                 <field name="fal_business_type"/>
-                                <field name="account_id" domain="[('company_id', '=', parent.company_id)]"/>
+                                <field name="account_id" domain="[('company_id', '=', parent.company_id),('id', '!=', parent.forbidden_account)]"/>
                                 <field name="partner_id"/>
                                 <field name="name" required="1"/>
                                 <field name="debit" sum="Total"/>
@@ -106,10 +115,14 @@
                             <field name="fal_create_batch_payment" invisible="1"/>
                             <field name="fal_business_type" attrs="{'readonly': [('state', '=', 'post')]}" readonly="1" force_save="1"/>
                             <field name="company_id" invisible="1"/>
+                            <field name="forbidden_account" invisible="1"/>
                         </group>
                         <group>
                             <field name="journal_id" options="{'no_create': True}" domain="[('type', 'in', ['bank', 'cash']), ('fal_business_type', '=', fal_business_type)]" attrs="{'readonly': [('state', '=', 'post')]}"/>
+                            <field name="total_payment"/>
                             <field name="payment_date" attrs="{'readonly': [('state', '=', 'post')]}"/>
+                            <field name="bon_id"/>
+                            <field name="nomor_bon"/>
                         </group>
                         <field name="invoice_ids" options="{'no_create': True}" domain="[('state', 'in', ['posted']), ('company_id', '=', company_id), ('type', 'in', ['out_invoice', 'in_refund']), ('invoice_payment_state', 'not in', ['paid'])]" context="{'tree_view_ref': 'account.view_invoice_tree', 'default_type': 'in_invoice'}" attrs="{'readonly': [('state', '=', 'post')]}">
                             <tree>
@@ -144,7 +157,7 @@
                             <tree string="Extra Payment Wizard Line" editable="bottom">
                                 <field name="company_id" invisible="1"/>
                                 <field name="fal_business_type"/>
-                                <field name="account_id" domain="[('company_id', '=', parent.company_id)]"/>
+                                <field name="account_id" domain="[('company_id', '=', parent.company_id),('id', '!=', parent.forbidden_account)]"/>
                                 <field name="partner_id"/>
                                 <field name="name" required="1"/>
                                 <field name="debit"/>

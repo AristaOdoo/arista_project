@@ -61,7 +61,12 @@ class BaseModel(models.AbstractModel):
             similar_adms_id = self.sudo().search(domain)
             if similar_adms_id:
                 # Before writing, make sure that this object method hasn't been called
-                able_overwrite = self.check_method(model, similar_adms_id)
+                # Special case on 17/18. let it pass
+                able_overwrite = False
+                if 'x_studio_nomorpolisi' in vals or 'x_studio_nomorstnk' in vals or 'x_studio_tanggalterimaspk' in vals or 'x_studio_bstbdate' in vals or 'x_studio_passondate' in vals:
+                    able_overwrite = True
+                else:
+                    able_overwrite = self.check_method(model, similar_adms_id)
                 if able_overwrite:
                     result = similar_adms_id.sudo().write(new_vals)
                 return similar_adms_id

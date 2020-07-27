@@ -27,7 +27,6 @@ class AccountMove(models.Model):
             # On arista it can create asset not by vendor bills (For Asset Acquisition Issue)
             # if not move.is_invoice():
             #     continue
-
             for move_line in move.line_ids:
                 # On Arista no need to check if value is 0
                 if (
@@ -80,3 +79,37 @@ class AccountMove(models.Model):
 
     def num_to_words_id(self, value):
         return num2words(value, lang="id")
+
+    def action_post(self):
+        for move in self:
+            if self.env.context.get('combine_account', False):
+                # On arista we need to combine line which has relation to so / po
+                # Has product, is invoice / vendor bills, same account, same debit/credit position
+                product_to_updates = {}
+                line_to_removes = []
+                for move_line in move.line_ids:
+                    if move_line.product_id and move_line.product_id.x_studio_adms_id != '99':
+                        key = move.key_maker(move_line)
+                        if key not in product_to_updates:
+                            product_to_updates[key] = {
+                                'move_line_id': move_line.id,
+                                'debit': move_line.debit,
+                                'credit': move_line.credit,
+                            }
+                        else:
+                            product_to_updates[key]['debit'] = product_to_updates[key]['debit'] + move_line.debit
+                            product_to_updates[key]['credit'] = product_to_updates[key]['credit'] + move_line.credit
+                            line_to_removes.append(move_line.id)
+                move_line_vals = []
+                for product_to_update in product_to_updates:
+                    move_line_vals.append((1, product_to_updates[product_to_update]['move_line_id'], {
+                        'debit': product_to_updates[product_to_update]['debit'],
+                        'credit': product_to_updates[product_to_update]['credit']
+                        }))
+                for line_to_remove in line_to_removes:
+                    move_line_vals.append((2, line_to_remove))
+                move.line_ids = move_line_vals
+        return super(AccountMove, self).action_post()
+
+    def key_maker(self, line_id):
+        return ("d" if line_id.debit else "c") + "|" + str(line_id.account_id.id) + "|" + str(line_id.product_id.id)
