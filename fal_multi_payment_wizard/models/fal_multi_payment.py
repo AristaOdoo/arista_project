@@ -31,6 +31,40 @@ class payment_register(models.Model):
     _name = 'account.payment.register.model'
     _description = 'Register Payment'
 
+    def _get_total_payment(self):
+        for aprm in self:
+            total_payment = 0
+            debit = 0
+            credit = 0
+            # Count for each payment line
+            for payment_wizard_line_id in aprm.payment_wizard_line_ids:
+                total_payment += abs(payment_wizard_line_id.amount)
+            for extra_line in aprm.extra_lines:
+                debit += extra_line.debit
+                credit += extra_line.credit
+            # Count for each extra line
+            if aprm.payment_type == 'out':
+                total_payment += debit - credit
+            else:
+                total_payment += credit - debit
+
+            aprm.total_payment = total_payment
+
+    def _get_partner_name(self):
+        for aprm in self:
+            name = ""
+            for invoice in aprm.invoice_ids:
+                name = invoice.invoice_partner_display_name
+            aprm.partner_name = name
+
+    @api.depends('journal_id')
+    def _get_forbidden_account(self):
+        for aprm in self:
+            if aprm.journal_id and aprm.journal_id.default_debit_account_id:
+                aprm.forbidden_account = aprm.journal_id.default_debit_account_id.id
+            else:
+                aprm.forbidden_account = 0
+
     @api.onchange('invoice_ids')
     def _default_payment_wizard_line_ids(self):
         temp = [(5, 0, 0)]
@@ -127,6 +161,11 @@ class payment_register(models.Model):
     company_id = fields.Many2one('res.company', 'Company', related="fal_business_type.company_id")
     extra_lines = fields.One2many("fal.multi.payment.wizard.extra.lines.model", 'register_payments_id', 'Extra Lines')
     state = fields.Selection([('draft', 'Draft'), ('post', 'Posted')], default="draft")
+    total_payment = fields.Float('Total Payment', compute="_get_total_payment")
+    forbidden_account = fields.Integer('Forbidden Account', compute="_get_forbidden_account")
+    bon_id = fields.Many2one('account.move', 'Bon')
+    nomor_bon = fields.Char('Nomor Bon', related="bon_id.x_studio_nomor_bon")
+    partner_name = fields.Char("Partner Name", compute="_get_partner_name")
 
     @api.onchange('fal_business_type')
     def _onchange_fal_business_type(self):
@@ -177,6 +216,8 @@ class payment_register(models.Model):
             raise UserError(_("You can only register at the same time for payment that are all inbound or all outbound"))
         if any(inv.company_id != self.invoice_ids[0].company_id for inv in self.invoice_ids):
             raise UserError(_("You can only register at the same time for payment that are all from the same company"))
+        if any(extra_line.account_id.id == self.forbidden_account for extra_line in self.extra_lines):
+            raise UserError(_("You cannot use journal bank account on extra lines"))
         # Value creation
         payment_wizard_line_vals = []
         for payment_wizard_line in self.payment_wizard_line_ids:
@@ -213,7 +254,7 @@ class payment_register(models.Model):
             'fal_business_type': self.fal_business_type.id,
             'extra_lines': extra_lines_vals,
         }
-        self.env['account.payment.register'].create(apr_vals).create_payments()
+        self.env['account.payment.register'].create(apr_vals).with_context(aprm_id=self.id).create_payments()
         self.state = 'post'
 
 
