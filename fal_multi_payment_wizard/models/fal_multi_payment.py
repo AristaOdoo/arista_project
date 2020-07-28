@@ -139,6 +139,11 @@ class payment_register(models.Model):
                 rec['payment_type'] = self._context.get('default_payment_type')
             else:
                 rec['payment_type'] = 'in'
+        if 'account_move_type' not in rec:
+            if self._context.get('default_account_move_type'):
+                rec['account_move_type'] = self._context.get('default_account_move_type')
+            else:
+                rec['account_move_type'] = 'out_invoice'
         if 'state' not in rec:
             rec['state'] = 'draft'
 
@@ -146,6 +151,7 @@ class payment_register(models.Model):
         rec['fal_business_type'] = user_id.fal_business_type_id and user_id.fal_business_type_id.id or False
         return rec
 
+    name = fields.Char("Name")
     payment_date = fields.Date(required=True, default=fields.Date.context_today)
     journal_id = fields.Many2one('account.journal', required=True, domain=[('type', 'in', ('bank', 'cash'))])
     payment_type = fields.Selection([('in', 'Money In'), ('out', 'Money Out')], required=True, default="in")
@@ -166,6 +172,11 @@ class payment_register(models.Model):
     bon_id = fields.Many2one('account.move', 'Bon')
     nomor_bon = fields.Char('Nomor Bon', related="bon_id.x_studio_nomor_bon")
     partner_name = fields.Char("Partner Name", compute="_get_partner_name")
+    account_move_type = fields.Selection([
+        ('out_invoice', 'Customer Invoice'),
+        ('out_refund', 'Customer Credit Note'),
+        ('in_invoice', 'Vendor Bills'),
+        ('in_refund', 'Vendor Refund')])
 
     @api.onchange('fal_business_type')
     def _onchange_fal_business_type(self):
