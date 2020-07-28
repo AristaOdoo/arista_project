@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="view_account_payment_form_arista">
+            <field name="name">view_account_payment_form_arista</field>
+            <field name="model">account.payment</field>
+            <field name="inherit_id" ref="account.view_account_payment_form" />
+            <field name="arch" type="xml">
+                <field name="company_id" position="after">
+                    <field name="fal_business_type" />
+                </field>
+            </field>
+        </record>
+    </data>
+</odoo>
