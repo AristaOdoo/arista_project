@@ -155,8 +155,10 @@ class BaseModel(models.AbstractModel):
                     # Both table have different approach
                     if m2o_model.model in ['res.partner']:
                         # Split between Customer / Vendor Transaction.
-                        if model.model in ['purchase.order', 'purchase.order.line', 'x_spkbbn']:
+                        if model.model in ['purchase.order', 'purchase.order.line', 'x_spkbbn'] or key in ['x_studio_adms_id_x_studio_vendor_biro_jasa']:
                             # Let's find it on business type level first, if not found, search again on company level
+                            # Except for x_studio_adms_id_x_studio_vendor_biro_jasa
+                            # need to find on supplier
                             real_id = self.env[field.relation].sudo().search([('x_studio_adms_id', '=', vals[key]), (m2o_business_type.name, '=', business_type.id), (m2o_company.name, '=', business_type.company_id.id), ('supplier_rank', '>', 0)], limit=1)
                             if not real_id:
                                 real_id = self.env[field.relation].sudo().search([('x_studio_adms_id', '=', vals[key]), (m2o_company.name, '=', business_type.company_id.id), ('supplier_rank', '>', 0)], limit=1)
