@@ -1,0 +1,22 @@
+<odoo>
+	<template id="search_template_dms">
+        <div class="o_account_reports_filter_input_wrapper no_print">
+            <span class="searchIcon"><i class="fa fa-search o_dms_reports_filter_button" role="img" aria-label="Search" title="Search"></i></span>
+            <input class="o_dms_reports_filter_input" type="text" placeholder="Search DMS Ref" />
+        </div>
+    </template>
+
+    <template id="search_template_inherit" inherit_id="account_reports.search_template">
+        <xpath expr="." position="inside">
+            <div class="btn-group o_dropdown" t-if="options.get('dms')">
+            	<t t-call="fal_ledger_report.search_template_dms"/>
+        	</div>
+        </xpath>
+    </template>
+
+    <template id="assets_backend_search_dms" inherit_id="web.assets_backend">
+	    <xpath expr="." position="inside">
+	        <script type="text/javascript" src="/fal_ledger_report/static/src/js/ledger_report.js"></script>
+	    </xpath>
+	</template>
+</odoo>
