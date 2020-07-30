@@ -48,7 +48,7 @@
                         </group>
                         <notebook>
                             <page string="Purchase Orders">
-                                <field name="purchase_order_ids" domain="[('state','=','draft'), ('x_studio_reciept_type','=', apvo_type), ('x_studio_journal_apvo','=', False), ('partner_id', '=', partner_id), ('fal_business_type','=', parent.fal_business_type)]" options="{'no_create': True}" attrs="{'readonly': [('state', '=', 'post')]}">
+                                <field name="purchase_order_ids" domain="[('state','=','draft'), ('x_studio_reciept_type','=', apvo_type), ('x_studio_journal_apvo','=', False), ('partner_id', '=', partner_id), ('fal_business_type','=', fal_business_type)]" options="{'no_create': True}" attrs="{'readonly': [('state', '=', 'post')]}">
                                     <tree editable="bottom">
                                         <field name="x_studio_adms_id" readonly="1"/>
                                         <field name="partner_id" readonly="1"/>
