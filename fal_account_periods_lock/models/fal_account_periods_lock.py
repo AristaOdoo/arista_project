@@ -13,6 +13,10 @@ class fal_account_periods_lock(models.Model):
     _description = "Resurfacing Fiscal Year (v8)"
     _order = "date_start, id"
 
+    def _get_business_type_default(self):
+        user_id = self.env['res.users'].browse(self.env.uid)
+        return user_id.fal_business_type_id or False
+
     name = fields.Char(
         string='Period Name', required=True,
         help="Filled it with the Name Of Year", track_visibility='onchange')
@@ -20,6 +24,9 @@ class fal_account_periods_lock(models.Model):
     company_id = fields.Many2one(
         'res.company', string='Company', required=True,
         default=lambda self: self.env.company, readonly=True, states={'draft': [('readonly', False)]})
+    fal_business_type_id = fields.Many2one(
+        'fal.business.type', string='Business Type', required=True,
+        default=_get_business_type_default, readonly=True, states={'draft': [('readonly', False)]})
     date_start = fields.Date(string='Start Date', required=True, track_visibility='onchange', readonly=True, states={'draft': [('readonly', False)]})
     date_stop = fields.Date(string='End Date', required=True, track_visibility='onchange', readonly=True, states={'draft': [('readonly', False)]})
     period_ids = fields.One2many(
@@ -138,13 +145,16 @@ class fal_account_periods_lock_line(models.Model):
     company_id = fields.Many2one(
         'res.company', string='Company', store=True,
         readonly=True, related='fiscalyear_id.company_id')
+    fal_business_type_id = fields.Many2one(
+        'fal.business.type', string='Business Type', store=True,
+        readonly=True, related='fiscalyear_id.fal_business_type_id')
     state = fields.Selection([
         ('draft', 'Open'),
         ('done', 'Closed'),
     ], string='Status', readonly=True, copy=False, default='draft')
 
     _sql_constraints = [
-        ('name_company_uniq', 'unique(name, company_id)',
+        ('name_company_uniq', 'unique(name, fal_business_type_id)',
          'You have overlaps period'),
     ]
 
@@ -189,7 +199,13 @@ class fal_account_periods_lock_line(models.Model):
         else:
             user_id = self.env['res.users'].browse(self.env.uid)
             company_id = user_id.company_id.id
+        if self.env.context.get('fal_business_type_id', False):
+            fal_business_type_id = self.env.context['fal_business_type_id']
+        else:
+            user_id = self.env['res.users'].browse(self.env.uid)
+            fal_business_type_id = user_id.fal_business_type_id.id
         args.append(('company_id', '=', company_id))
+        args.append(('fal_business_type_id', '=', fal_business_type_id))
         ids = self.search(args)
         if not ids:
             if exception:
@@ -258,7 +274,7 @@ class AccountMove(models.Model):
         for move in self:
             period_line_obj = self.env['fal.account.periods.lock.line']
             period_ids = period_line_obj.with_context(
-                company_id=move.company_id.id).find(
+                company_id=move.company_id.id, fal_business_type_id=move.fal_business_type).find(
                 dt=move.date)
             if period_ids:
                 lock_date = period_ids[0].non_adviser_locking_date
