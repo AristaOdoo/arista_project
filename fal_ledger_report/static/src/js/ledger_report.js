@@ -14,6 +14,14 @@ Account_report_generic.include({
             self.report_options.filter_dms = self.$searchview_buttons.find('.o_dms_reports_filter_input').val();
             self.reload()
         });
+
+        if (this.report_options.filter_bon) {
+            this.$searchview_buttons.find('.o_bon_reports_filter_input').val(this.report_options.filter_bon);
+        }
+        this.$searchview_buttons.find('.o_bon_reports_filter_button').click(function (event) {
+            self.report_options.filter_bon = self.$searchview_buttons.find('.o_bon_reports_filter_input').val();
+            self.reload()
+        });
         return this.$searchview_buttons;
     },
 });
