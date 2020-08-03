@@ -274,7 +274,7 @@ class AccountMove(models.Model):
         for move in self:
             period_line_obj = self.env['fal.account.periods.lock.line']
             period_ids = period_line_obj.with_context(
-                company_id=move.company_id.id, fal_business_type_id=move.fal_business_type).find(
+                company_id=move.company_id.id, fal_business_type_id=move.fal_business_type.id).find(
                 dt=move.date)
             if period_ids:
                 lock_date = period_ids[0].non_adviser_locking_date
