@@ -11,6 +11,7 @@ class ReportPartnerLedger(models.AbstractModel):
 
     filter_dms = True
     filter_filter_dms = ''
+    filter_filter_bon = ''
 
     @api.model
     def _get_options_domain(self, options):
@@ -18,6 +19,10 @@ class ReportPartnerLedger(models.AbstractModel):
         if options.get('filter_dms'):
             domain += [
                 ('x_studio_dmsrefnumber', 'ilike', options['filter_dms']),
+            ]
+        if options.get('filter_bon'):
+            domain += [
+                ('x_studio_nomor_bon', 'ilike', options['filter_bon']),
             ]
         return domain
 
@@ -74,6 +79,7 @@ class AccountGeneralLedgerReport(models.AbstractModel):
 
     filter_dms = True
     filter_filter_dms = ''
+    filter_filter_bon = ''
 
     @api.model
     def _get_options_domain(self, options):
@@ -82,11 +88,15 @@ class AccountGeneralLedgerReport(models.AbstractModel):
             domain += [
                 ('x_studio_dmsrefnumber', 'ilike', options['filter_dms']),
             ]
+
+        if options.get('filter_bon'):
+            domain += [
+                ('x_studio_nomor_bon', 'ilike', options['filter_bon']),
+            ]
         return domain
 
     @api.model
     def _get_query_amls(self, options, expanded_partner=None, offset=None, limit=None):
-        print(options, 'hhhhhhhhhhhhh')
         res = super(AccountGeneralLedgerReport, self)._get_query_amls(options, expanded_partner, offset, limit)
         query = res[0][:100] + 'account_move_line.x_studio_dmsrefnumber, account_move_line.x_studio_nomor_bon,' + res[0][100:]
         return query, res[1]

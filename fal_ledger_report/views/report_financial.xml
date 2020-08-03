@@ -6,10 +6,21 @@
         </div>
     </template>
 
+    <template id="search_template_bon">
+        <div class="o_account_reports_filter_input_wrapper no_print">
+            <span class="searchIcon"><i class="fa fa-search o_bon_reports_filter_button" role="img" aria-label="Search" title="Search"></i></span>
+            <input class="o_bon_reports_filter_input" type="text" placeholder="Search Nomor Bon" />
+        </div>
+    </template>
+
     <template id="search_template_inherit" inherit_id="account_reports.search_template">
         <xpath expr="." position="inside">
             <div class="btn-group o_dropdown" t-if="options.get('dms')">
-            	<t t-call="fal_ledger_report.search_template_dms"/>
+                <t t-call="fal_ledger_report.search_template_dms"/>
+            </div>
+
+            <div class="btn-group o_dropdown" t-if="options.get('dms')">
+            	<t t-call="fal_ledger_report.search_template_bon"/>
         	</div>
         </xpath>
     </template>
