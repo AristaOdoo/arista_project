@@ -71,7 +71,7 @@ class BaseModel(models.AbstractModel):
                     # Special for spk payment multi, we need to unlink first all spk payment related
                     if model.model in ['x_spk_payment_multi']:
                         spk_payment_vals = []
-                        for x_spk_payment in similar_adms_id.x_spk_payment_multi:
+                        for x_spk_payment in similar_adms_id.x_studio_spk_payment:
                             spk_payment_vals += [(2, x_spk_payment.id)]
                         similar_adms_id.sudo().write({'x_studio_spk_payment': spk_payment_vals})
                     result = similar_adms_id.sudo().write(new_vals)
