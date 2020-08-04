@@ -13,3 +13,4 @@ from . import fal_product_dimension
 from . import product
 from . import sale
 from . import mass_generate_apvo
+from . import ir_sequence
