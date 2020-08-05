@@ -330,6 +330,7 @@ class account_register_payments(models.TransientModel):
                     for line in branch_am.line_ids.filtered(lambda a: a.name.split(":")[-1] == ' ' + rec.invoice_ids[0].name and a.account_internal_type in ['receivable', 'payable']):
                         rec.invoice_ids[0].js_assign_outstanding_line(line.id)
 
+    name = fields.Char("Name")
     payment_wizard_line_ids = fields.One2many(
         'fal.multi.payment.wizard',
         'register_payments_id', 'Payment List', default=_default_payment_wizard_line_ids)
@@ -388,6 +389,7 @@ class account_register_payments(models.TransientModel):
                     'credit': total_amount > 0.0 and total_amount or 0.0,
                     'date_maturity': payment.payment_date,
                     'account_id': liquidity_line_account.id,
+                    'name': payment.name,
             })
             line_ids.append(value)
 

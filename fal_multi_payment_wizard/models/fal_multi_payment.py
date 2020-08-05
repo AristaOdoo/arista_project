@@ -264,6 +264,7 @@ class payment_register(models.Model):
             'fal_split_multi_payment': self.fal_split_multi_payment,
             'fal_business_type': self.fal_business_type.id,
             'extra_lines': extra_lines_vals,
+            'name': self.name,
         }
         self.env['account.payment.register'].create(apr_vals).with_context(aprm_id=self.id).create_payments()
         self.state = 'post'
