@@ -384,12 +384,11 @@ class account_register_payments(models.TransientModel):
                 })
                 line_ids.append(vals)
 
-            value = (0, 0, {'name': 'Payment',
+            value = (0, 0, {'name': payment.name,
                     'debit': total_amount < 0.0 and -total_amount or 0.0,
                     'credit': total_amount > 0.0 and total_amount or 0.0,
                     'date_maturity': payment.payment_date,
                     'account_id': liquidity_line_account.id,
-                    'name': payment.name,
             })
             line_ids.append(value)
 
