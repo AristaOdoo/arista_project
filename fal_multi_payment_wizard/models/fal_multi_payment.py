@@ -125,9 +125,6 @@ class payment_register(models.Model):
     @api.model
     def default_get(self, fields):
         rec = {}
-        if 'journal_id' not in rec:
-            user_id = self.env['res.users'].browse(self.env.uid)
-            rec['journal_id'] = self.env['account.journal'].search([('fal_business_type', '=', user_id.fal_business_type_id.id), ('company_id', '=', self.env.company.id), ('type', 'in', ('bank', 'cash'))], limit=1).id
         if 'payment_date' not in rec:
             rec['payment_date'] = datetime.date.today()
         if 'fal_split_multi_payment' not in rec:
@@ -144,6 +141,12 @@ class payment_register(models.Model):
                 rec['account_move_type'] = self._context.get('default_account_move_type')
             else:
                 rec['account_move_type'] = 'out_invoice'
+        if 'journal_id' not in rec:
+            user_id = self.env['res.users'].browse(self.env.uid)
+            if rec['account_move_type'] in ['out_invoice', 'in_refund']:
+                rec['journal_id'] = self.env['account.journal'].search([('fal_business_type', '=', user_id.fal_business_type_id.id), ('company_id', '=', self.env.company.id), ('type', 'in', ('bank', 'cash')), ('x_studio_type_bon', '=', 'm')], limit=1).id
+            else:
+                rec['journal_id'] = self.env['account.journal'].search([('fal_business_type', '=', user_id.fal_business_type_id.id), ('company_id', '=', self.env.company.id), ('type', 'in', ('bank', 'cash')), ('x_studio_type_bon', '=', 'h')], limit=1).id
         if 'state' not in rec:
             rec['state'] = 'draft'
 
