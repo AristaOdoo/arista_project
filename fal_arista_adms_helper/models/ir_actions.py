@@ -221,8 +221,11 @@ class IrActionsServer(models.Model):
                                 total_dp += move_line.debit + move_line.credit
                     result['total_dp'] = total_dp
                     total_pay = 0.0
-                    for invoice in real_id.invoice_ids:
-                        total_pay += (invoice.amount_residual - (invoice.amount_total + invoice.x_studio_discount)) * -1
+                    if real_id.invoice_ids:
+                        for invoice in real_id.invoice_ids:
+                            total_pay += (invoice.amount_residual - (invoice.amount_total + invoice.x_studio_discount)) * -1
+                    else:
+                        total_pay = total_dp
                     result['total_pay'] = total_pay
                 return result
         result['isSuccess'] = False
