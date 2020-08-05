@@ -151,7 +151,7 @@ class payment_register(models.Model):
         rec['fal_business_type'] = user_id.fal_business_type_id and user_id.fal_business_type_id.id or False
         return rec
 
-    name = fields.Char("Name")
+    name = fields.Char("Name", required=True)
     payment_date = fields.Date(required=True, default=fields.Date.context_today)
     journal_id = fields.Many2one('account.journal', required=True, domain=[('type', 'in', ('bank', 'cash'))])
     payment_type = fields.Selection([('in', 'Money In'), ('out', 'Money Out')], required=True, default="in")
