@@ -221,11 +221,14 @@ class IrActionsServer(models.Model):
                                 total_dp += move_line.debit + move_line.credit
                     result['total_dp'] = total_dp
                     total_pay = 0.0
-                    if real_id.invoice_ids:
-                        for invoice in real_id.invoice_ids:
-                            total_pay += (invoice.amount_residual - (invoice.amount_total + invoice.x_studio_discount)) * -1
-                    else:
-                        total_pay = total_dp
+                    for spk_pay in spk_pay_list.filtered(lambda x: (not x.x_studio_bon_hijau) and x.x_studio_bon_merah):
+                        # Bank Journal Account
+                        account_id = spk_pay.x_studio_bon_merah.journal_id.default_debit_account_id
+                        if not account_id:
+                            account_id = spk_pay.x_studio_bon_merah.journal_id.default_credit_account_id
+                        for move_line in spk_pay.x_studio_bon_merah.line_ids:
+                            if move_line.account_id.id == account_id.id:
+                                total_pay += move_line.debit + move_line.credit
                     result['total_pay'] = total_pay
                 return result
         result['isSuccess'] = False
