@@ -125,9 +125,6 @@ class payment_register(models.Model):
     @api.model
     def default_get(self, fields):
         rec = {}
-        if 'journal_id' not in rec:
-            user_id = self.env['res.users'].browse(self.env.uid)
-            rec['journal_id'] = self.env['account.journal'].search([('fal_business_type', '=', user_id.fal_business_type_id.id), ('company_id', '=', self.env.company.id), ('type', 'in', ('bank', 'cash'))], limit=1).id
         if 'payment_date' not in rec:
             rec['payment_date'] = datetime.date.today()
         if 'fal_split_multi_payment' not in rec:
@@ -144,6 +141,12 @@ class payment_register(models.Model):
                 rec['account_move_type'] = self._context.get('default_account_move_type')
             else:
                 rec['account_move_type'] = 'out_invoice'
+        if 'journal_id' not in rec:
+            user_id = self.env['res.users'].browse(self.env.uid)
+            if rec['account_move_type'] in ['out_invoice', 'in_refund']:
+                rec['journal_id'] = self.env['account.journal'].search([('fal_business_type', '=', user_id.fal_business_type_id.id), ('company_id', '=', self.env.company.id), ('type', 'in', ('bank', 'cash')), ('x_studio_type_bon', '=', 'm')], limit=1).id
+            else:
+                rec['journal_id'] = self.env['account.journal'].search([('fal_business_type', '=', user_id.fal_business_type_id.id), ('company_id', '=', self.env.company.id), ('type', 'in', ('bank', 'cash')), ('x_studio_type_bon', '=', 'h')], limit=1).id
         if 'state' not in rec:
             rec['state'] = 'draft'
 
@@ -181,9 +184,14 @@ class payment_register(models.Model):
     @api.onchange('fal_business_type')
     def _onchange_fal_business_type(self):
         if self.fal_business_type:
-            domain = {
-                'journal_id': [('fal_business_type', '=', self.fal_business_type.id), ('type', 'in', ['bank', 'cash'])],
-            }
+            if self.account_move_type in ['out_invoice', 'in_refund']:
+                domain = {
+                    'journal_id': [('fal_business_type', '=', self.fal_business_type.id), ('type', 'in', ['bank', 'cash']), ('x_studio_type_bon', '=', 'm')],
+                }
+            else:
+                domain = {
+                    'journal_id': [('fal_business_type', '=', self.fal_business_type.id), ('type', 'in', ['bank', 'cash']), ('x_studio_type_bon', '=', 'h')],
+                }
             return {'domain': domain}
 
     @api.onchange('journal_id', 'invoice_ids')
@@ -195,7 +203,11 @@ class payment_register(models.Model):
                 domain_payment = [('payment_type', '=', 'inbound'), ('id', 'in', self.journal_id.inbound_payment_method_ids.ids)]
             else:
                 domain_payment = [('payment_type', '=', 'outbound'), ('id', 'in', self.journal_id.outbound_payment_method_ids.ids)]
-            domain_journal = [('type', 'in', ('bank', 'cash')), ('company_id', '=', invoices[0].company_id.id)]
+            domain_journal = [('type', 'in', ('bank', 'cash')), ('fal_business_type', '=', self.fal_business_type.id)]
+            if self.account_move_type in ['out_invoice', 'in_refund']:
+                domain_journal = [('type', 'in', ('bank', 'cash')), ('fal_business_type', '=', self.fal_business_type.id), ('x_studio_type_bon', '=', 'm')]
+            else:
+                domain_journal = [('type', 'in', ('bank', 'cash')), ('fal_business_type', '=', self.fal_business_type.id), ('x_studio_type_bon', '=', 'h')]
             for wizard_line in self.payment_wizard_line_ids:
                 wizard_line.journal_id = self.journal_id.id
                 self.payment_method_id = wizard_line.payment_method_id and wizard_line.payment_method_id[0]
