@@ -171,6 +171,8 @@ class account_register_payments(models.TransientModel):
         return {'type': 'ir.actions.act_window_close'}
 
     def create_payments(self):
+        # Journal Created List
+        journal_ids = []
         # create entries only
         payment_moves = self._prepare_payment_moves()
         AccountMove = self.env['account.move'].with_context(default_type='entry')
@@ -208,6 +210,7 @@ class account_register_payments(models.TransientModel):
             self.env['account.payment.register.model'].browse(self.env.context.get('aprm_id', False)).write({
                 'bon_id': moves.id,
             })
+            journal_ids.append(moves.id)
         # In Arista there is a condition that Head Office pay for other branch purchases.
         # So, we need construct the data per branch
         value_line_ids_per_branch = {}
@@ -322,6 +325,8 @@ class account_register_payments(models.TransientModel):
                 'ref': 'InterBranch Payment',
                 'type': 'entry',
             })
+            if self.env.context.get('aprm_id', False):
+                journal_ids.append(branch_am.id)
             # Post the Journal Entries
             branch_am.action_post()
             # Reconcile
@@ -329,6 +334,10 @@ class account_register_payments(models.TransientModel):
                 for rec in payment.payment_wizard_line_ids:
                     for line in branch_am.line_ids.filtered(lambda a: a.name.split(":")[-1] == ' ' + rec.invoice_ids[0].name and a.account_internal_type in ['receivable', 'payable']):
                         rec.invoice_ids[0].js_assign_outstanding_line(line.id)
+        if self.env.context.get('aprm_id', False):
+            self.env['account.payment.register.model'].browse(self.env.context.get('aprm_id', False)).write({
+                'account_move_ids': [(6, 0, journal_ids)],
+            })
 
     name = fields.Char("Name")
     payment_wizard_line_ids = fields.One2many(
@@ -381,6 +390,7 @@ class account_register_payments(models.TransientModel):
                         'date_maturity': payment.payment_date,
                         'partner_id': partner_id.id,
                         'account_id': destination_account.id,
+                        'x_studio_per_line_dmsrefnum': pay.invoice_ids[0] and pay.invoice_ids[0].invoice_origin or "/"
                 })
                 line_ids.append(vals)
 

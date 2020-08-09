@@ -77,8 +77,13 @@ class BaseModel(models.AbstractModel):
                     result = similar_adms_id.sudo().write(new_vals)
                 return similar_adms_id
             else:
-                result = self.sudo().create(new_vals)
-                return result
+                # If they try to create bon hijau without the bon merah
+                # Return Error
+                if model.model in ['x_spk_payment'] and 'x_studio_bankaccountcancelid' in new_vals:
+                    return "Can't create Bon Hijau without Posting Bon Merah"
+                else:
+                    result = self.sudo().create(new_vals)
+                    return result
         return "Something Went Wrong"
 
     def iterate_and_compute(self, model, vals, business_type):
