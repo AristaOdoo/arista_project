@@ -116,8 +116,6 @@
                                 <field name="amount_untaxed_signed" invisible="1" string="Tax Excluded" sum="Total" optional="show"/>
                                 <field name="amount_tax_signed" invisible="1" string="Tax" sum="Total" optional="hide"/>
                                 <field name="amount_total_signed" invisible="0" string="Total" sum="Total" optional="show"/>
-                                <field name="x_studio_discount" invisible="1" />
-                                <field name="amount_residual_signed" invisible="1" string="Amount Due" sum="Amount Due" optional="show"/>
                                 <field name="currency_id" invisible="1"/>
                                 <field name="company_currency_id" invisible="1"/>
                                 <field name="state" optional="show" invisible="0" />
@@ -226,8 +224,6 @@
                                 <field name="amount_untaxed_signed" invisible="1" string="Tax Excluded" sum="Total" optional="show"/>
                                 <field name="amount_tax_signed" invisible="1" string="Tax" sum="Total" optional="hide"/>
                                 <field name="amount_total_signed" invisible="0" string="Total" sum="Total" optional="show"/>
-                                <field name="x_studio_discount" invisible="1" />
-                                <field name="amount_residual_signed" invisible="1" string="Amount Due" sum="Amount Due" optional="show"/>
                                 <field name="currency_id" invisible="1"/>
                                 <field name="company_currency_id" invisible="1"/>
                                 <field name="state" optional="show" invisible="0" />
@@ -336,8 +332,6 @@
                                 <field name="amount_untaxed_signed" invisible="1" string="Tax Excluded" sum="Total" optional="show"/>
                                 <field name="amount_tax_signed" invisible="1" string="Tax" sum="Total" optional="hide"/>
                                 <field name="amount_total_signed" invisible="0" string="Total" sum="Total" optional="show"/>
-                                <field name="x_studio_discount" invisible="1" />
-                                <field name="amount_residual_signed" invisible="1" string="Amount Due" sum="Amount Due" optional="show"/>
                                 <field name="currency_id" invisible="1"/>
                                 <field name="company_currency_id" invisible="1"/>
                                 <field name="state" optional="show" invisible="0" />
@@ -446,12 +440,9 @@
                                 <field name="amount_untaxed_signed" invisible="1" string="Tax Excluded" sum="Total" optional="show"/>
                                 <field name="amount_tax_signed" invisible="1" string="Tax" sum="Total" optional="hide"/>
                                 <field name="amount_total_signed" invisible="0" string="Total" sum="Total" optional="show"/>
-                                <field name="x_studio_discount" invisible="1" />
-                                <field name="amount_residual_signed" invisible="1" string="Amount Due" sum="Amount Due" optional="show"/>
                                 <field name="currency_id" invisible="1"/>
                                 <field name="company_currency_id" invisible="1"/>
                                 <field name="state" optional="show" invisible="0" />
-                                <field name="invoice_payment_state" optional="hide" invisible="1" />
                                 <field name="type" invisible="context.get('default_type', True)"/>
                             </tree>
                         </field>
