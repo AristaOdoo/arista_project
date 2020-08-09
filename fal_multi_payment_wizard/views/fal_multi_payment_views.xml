@@ -109,7 +109,6 @@
                                 <field name="invoice_payment_ref" optional="hide" invisible="context.get('default_type') in ('out_invoice', 'out_refund','out_receipt')"/>
                                 <field name="ref" optional="hide"/>
                                 <field name="invoice_user_id" optional="show" invisible="1" string="Sales Person" groups="base.group_no_one"/>
-                                <field name="team_id" invisible="1" optional="hide"/>
 
                                 <field name="company_id" groups="base.group_no_one" options="{'no_create': True}" optional="show"/>
                                 <field name="fal_business_type" invisible="1" />
@@ -220,7 +219,6 @@
                                 <field name="invoice_payment_ref" optional="hide" invisible="context.get('default_type') in ('out_invoice', 'out_refund','out_receipt')"/>
                                 <field name="ref" optional="hide"/>
                                 <field name="invoice_user_id" optional="show" invisible="1" string="Sales Person" groups="base.group_no_one"/>
-                                <field name="team_id" invisible="1" optional="hide"/>
 
                                 <field name="company_id" groups="base.group_no_one" options="{'no_create': True}" optional="show"/>
                                 <field name="fal_business_type" invisible="1" />
@@ -331,7 +329,6 @@
                                 <field name="invoice_payment_ref" optional="hide" invisible="context.get('default_type') in ('out_invoice', 'out_refund','out_receipt')"/>
                                 <field name="ref" optional="hide"/>
                                 <field name="invoice_user_id" optional="show" invisible="1" string="Sales Person" groups="base.group_no_one"/>
-                                <field name="team_id" invisible="1" optional="hide"/>
 
                                 <field name="company_id" groups="base.group_no_one" options="{'no_create': True}" optional="show"/>
                                 <field name="fal_business_type" invisible="1" />
@@ -442,7 +439,6 @@
                                 <field name="invoice_payment_ref" optional="hide" invisible="context.get('default_type') in ('out_invoice', 'out_refund','out_receipt')"/>
                                 <field name="ref" optional="hide"/>
                                 <field name="invoice_user_id" optional="show" invisible="1" string="Sales Person" groups="base.group_no_one"/>
-                                <field name="team_id" invisible="1" optional="hide"/>
 
                                 <field name="company_id" groups="base.group_no_one" options="{'no_create': True}" optional="show"/>
                                 <field name="fal_business_type" invisible="1" />
