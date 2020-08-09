@@ -180,6 +180,7 @@ class payment_register(models.Model):
         ('out_refund', 'Customer Credit Note'),
         ('in_invoice', 'Vendor Bills'),
         ('in_refund', 'Vendor Refund')])
+    account_move_ids = fields.Many2many('account.move', string="Journals", copy=False, readonly=True)
 
     @api.onchange('fal_business_type')
     def _onchange_fal_business_type(self):
