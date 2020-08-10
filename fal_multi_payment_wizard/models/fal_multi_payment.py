@@ -72,7 +72,7 @@ class payment_register(models.Model):
             active_ids = self.invoice_ids
             for invoices in active_ids:
                 currency = False
-                journal = self.env['account.journal'].search(
+                journal = self.journal_id or self.env['account.journal'].search(
                     [('type', '=', 'bank')], limit=1)
                 if any(inv.currency_id != invoices[0].currency_id
                        for inv in invoices):
