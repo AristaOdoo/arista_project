@@ -295,6 +295,11 @@ class AccountMove(models.Model):
         default['date'] = fields.Datetime.now()
         return super(AccountMove, self).copy(default=default)
 
+    def action_post(self):
+        for move in self:
+            move._check_fiscalyear_lock_date()
+        return super(AccountMove, self).action_post()
+
 
 class AccountMoveLine(models.Model):
     _inherit = 'account.move.line'
@@ -305,3 +310,9 @@ class AccountMoveLine(models.Model):
         lines = super(AccountMoveLine, self).create(vals_list)
         lines.mapped('move_id')._check_fiscalyear_lock_date()
         return lines
+
+    def write(self, vals):
+        # Check Lock Date at Creation
+        res = super(AccountMoveLine, self).write(vals)
+        self.mapped('move_id')._check_fiscalyear_lock_date()
+        return res
