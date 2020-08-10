@@ -80,7 +80,7 @@ class IrActionsServer(models.Model):
             action_server = self.browse(operation)
             # Model Info
             model = action_server.model_id
-            business_type_field = model.field_id.sudo().filtered(lambda x: x.relation == 'fal.business.type' and x.ttype == 'many2one' and x.name not in ['x_studio_unitowner', 'x_studio_frombranch', 'x_studio_tobranch'])
+            business_type_field = model.field_id.sudo().filtered(lambda x: x.relation == 'fal.business.type' and x.ttype == 'many2one' and x.name not in ['x_studio_unitowner', 'x_studio_frombranch', 'x_studio_tobranch', 'x_studio_origin'])
             company_type_field = model.field_id.sudo().filtered(lambda x: x.relation == 'res.company' and x.ttype == 'many2one')
             # Business Type/Company Record
             business_type = self.env['fal.business.type'].sudo().search([('x_studio_adms_id', '=', fal_business_type)], limit=1)
