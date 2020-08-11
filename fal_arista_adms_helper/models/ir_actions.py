@@ -223,7 +223,6 @@ class IrActionsServer(models.Model):
                             for move_line in spk_pay.x_studio_bon_merah.line_ids:
                                 if move_line.account_id.id == account_id.id:
                                     total_dp += move_line.debit + move_line.credit
-                                    print(move_line.debit + move_line.credit)
                             dp_has_been_checked.append(spk_pay.x_studio_bon_merah.id)
                         if spk_pay.x_studio_bon_hijau.id not in dp_has_been_checked:
                             # Bank Journal Account
