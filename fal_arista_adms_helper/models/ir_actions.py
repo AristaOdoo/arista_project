@@ -210,53 +210,13 @@ class IrActionsServer(models.Model):
                 if real_id:
                     # For total DP we find spk payment that is related to this sale order
                     total_dp = 0.0
-                    spk_pay_list = self.env['x_spk_payment'].sudo().search([('x_studio_nospk', '=', real_id.id)])
-                    dp_has_been_checked = []
-                    for spk_pay in spk_pay_list.filtered(lambda x: x.x_studio_paymtype in ['1', '2'] and x.x_studio_bon_merah):
-                        # If multi payment, 1 bon can share several payment
-                        # we need to only check on bon that not have been checked
-                        if spk_pay.x_studio_bon_merah.id not in dp_has_been_checked:
-                            # Bank Journal Account
-                            account_id = spk_pay.x_studio_bon_merah.journal_id.default_debit_account_id
-                            if not account_id:
-                                account_id = spk_pay.x_studio_bon_merah.journal_id.default_credit_account_id
-                            for move_line in spk_pay.x_studio_bon_merah.line_ids:
-                                if move_line.account_id.id == account_id.id:
-                                    total_dp += move_line.debit + move_line.credit
-                            dp_has_been_checked.append(spk_pay.x_studio_bon_merah.id)
-                        if spk_pay.x_studio_bon_hijau.id not in dp_has_been_checked:
-                            # Bank Journal Account
-                            account_id = spk_pay.x_studio_bon_hijau.journal_id.default_debit_account_id
-                            if not account_id:
-                                account_id = spk_pay.x_studio_bon_hijau.journal_id.default_credit_account_id
-                            for move_line in spk_pay.x_studio_bon_hijau.line_ids:
-                                if move_line.account_id.id == account_id.id:
-                                    total_dp -= move_line.debit + move_line.credit
-                            dp_has_been_checked.append(spk_pay.x_studio_bon_hijau.id)
-                    result['total_dp'] = total_dp
                     total_pay = 0.0
-                    total_has_been_checked = []
-                    for spk_pay in spk_pay_list.filtered(lambda x: x.x_studio_bon_merah):
-                        # If multi payment, 1 bon can share several payment
-                        # we need to only check on bon that not have been checked
-                        if spk_pay.x_studio_bon_merah.id not in total_has_been_checked:
-                            # Bank Journal Account
-                            account_id = spk_pay.x_studio_bon_merah.journal_id.default_debit_account_id
-                            if not account_id:
-                                account_id = spk_pay.x_studio_bon_merah.journal_id.default_credit_account_id
-                            for move_line in spk_pay.x_studio_bon_merah.line_ids:
-                                if move_line.account_id.id == account_id.id:
-                                    total_pay += move_line.debit + move_line.credit
-                            total_has_been_checked.append(spk_pay.x_studio_bon_merah.id)
-                        if spk_pay.x_studio_bon_hijau.id not in total_has_been_checked:
-                            # Bank Journal Account
-                            account_id = spk_pay.x_studio_bon_hijau.journal_id.default_debit_account_id
-                            if not account_id:
-                                account_id = spk_pay.x_studio_bon_hijau.journal_id.default_credit_account_id
-                            for move_line in spk_pay.x_studio_bon_hijau.line_ids:
-                                if move_line.account_id.id == account_id.id:
-                                    total_pay -= move_line.debit + move_line.credit
-                            total_has_been_checked.append(spk_pay.x_studio_bon_hijau.id)
+                    spk_pay_list = self.env['x_spk_payment'].sudo().search([('x_studio_nospk', '=', real_id.id)])
+                    for spk_pay in spk_pay_list.filtered(lambda x: x.x_studio_bon_merah and (not x.x_studio_bon_hijau)):
+                        if spk_pay.x_studio_paymtype in ['1', '2']:
+                            total_dp += spk_pay.x_studio_amount
+                        total_pay += spk_pay.x_studio_amount
+                    result['total_dp'] = total_dp
                     result['total_pay'] = total_pay
                 return result
         result['isSuccess'] = False
