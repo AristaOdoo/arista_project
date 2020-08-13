@@ -383,14 +383,18 @@ class account_register_payments(models.TransientModel):
                         rec_pay_line_name += _("Vendor Payment")
                 if pay.invoice_ids:
                     rec_pay_line_name += ': %s' % ', '.join(pay.invoice_ids.mapped('name'))
-
+                per_line_dmsrefnum = '/'
+                if pay.partner_type == 'customer':
+                    per_line_dmsrefnum = pay.invoice_ids[0] and pay.invoice_ids[0].invoice_origin
+                elif pay.partner_type == 'supplier':
+                    per_line_dmsrefnum = pay.invoice_ids[0] and pay.invoice_ids[0].name
                 vals = (0, 0, {'name': rec_pay_line_name,
                         'debit': counterpart_amount > 0.0 and counterpart_amount or 0.0,
                         'credit': counterpart_amount < 0.0 and -counterpart_amount or 0.0,
                         'date_maturity': payment.payment_date,
                         'partner_id': partner_id.id,
                         'account_id': destination_account.id,
-                        'x_studio_per_line_dmsrefnum': pay.invoice_ids[0] and pay.invoice_ids[0].invoice_origin or "/"
+                        'x_studio_per_line_dmsrefnum': per_line_dmsrefnum or "/"
                 })
                 line_ids.append(vals)
 
