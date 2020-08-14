@@ -112,7 +112,7 @@ class AccountMove(models.Model):
         return super(AccountMove, self).action_post()
 
     def key_maker(self, line_id):
-        return ("d" if line_id.debit else "c") + "|" + str(line_id.account_id.id) + "|" + str(line_id.product_id.id)
+        return ("d" if line_id.debit else "c") + "|" + str(line_id.account_id.id)
 
     def get_line_ids(self, move_line_ids, dmsrefnum, line_checked):
         journal_payment_ids = []
