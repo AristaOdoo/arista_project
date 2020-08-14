@@ -114,7 +114,11 @@ class AccountPayment(models.Model):
                 liquidity_line_name = payment.name
 
             # ==== 'inbound' / 'outbound' ====
-
+            per_line_dmsrefnum = '/'
+            if payment.partner_type == 'customer':
+                per_line_dmsrefnum = payment.invoice_ids[0] and payment.invoice_ids[0].invoice_origin
+            elif payment.partner_type == 'supplier':
+                per_line_dmsrefnum = payment.invoice_ids[0] and payment.invoice_ids[0].name
             move_vals = {
                 'date': payment.payment_date,
                 'ref': payment.communication,
@@ -133,7 +137,7 @@ class AccountPayment(models.Model):
                         'partner_id': payment.partner_id.commercial_partner_id.id,
                         'account_id': payment.destination_account_id.id,
                         'payment_id': payment.id,
-                        'x_studio_per_line_dmsrefnum': payment.invoice_ids[0] and payment.invoice_ids[0].invoice_origin or "/"
+                        'x_studio_per_line_dmsrefnum': per_line_dmsrefnum or "/"
                     }),
                     # Liquidity line.
                     (0, 0, {
