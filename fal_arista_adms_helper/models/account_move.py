@@ -113,3 +113,24 @@ class AccountMove(models.Model):
 
     def key_maker(self, line_id):
         return ("d" if line_id.debit else "c") + "|" + str(line_id.account_id.id) + "|" + str(line_id.product_id.id)
+
+    def get_line_ids(self, move_line_ids, dmsrefnum, line_checked):
+        journal_payment_ids = []
+        for line in move_line_ids:
+            if line.id not in line_checked:
+                line_checked.append(line.id)
+                for matched_credit_id in line.matched_credit_ids:
+                    if matched_credit_id.credit_move_id.partner_id == line.partner_id and matched_credit_id.credit_move_id.x_studio_dmsrefnumber == dmsrefnum:
+                        journal_payment_ids.append(matched_credit_id.credit_move_id.id)
+                        journal_payment_ids.extend(line.move_id.get_line_ids(matched_credit_id.credit_move_id.move_id.line_ids, dmsrefnum, line_checked))
+                    if matched_credit_id.debit_move_id.partner_id == line.partner_id and matched_credit_id.debit_move_id.x_studio_dmsrefnumber == dmsrefnum:
+                        journal_payment_ids.append(matched_credit_id.debit_move_id.id)
+                        journal_payment_ids.extend(line.move_id.get_line_ids(matched_credit_id.debit_move_id.move_id.line_ids, dmsrefnum, line_checked))
+                for matched_debit_id in line.matched_debit_ids:
+                    if matched_debit_id.debit_move_id.partner_id == line.partner_id and matched_debit_id.debit_move_id.x_studio_dmsrefnumber == dmsrefnum:
+                        journal_payment_ids.append(matched_debit_id.debit_move_id.id)
+                        journal_payment_ids.extend(line.move_id.get_line_ids(matched_debit_id.debit_move_id.move_id.line_ids, dmsrefnum, line_checked))
+                    if matched_debit_id.credit_move_id.partner_id == line.partner_id and matched_debit_id.credit_move_id.x_studio_dmsrefnumber == dmsrefnum:
+                        journal_payment_ids.append(matched_debit_id.credit_move_id.id)
+                        journal_payment_ids.extend(line.move_id.get_line_ids(matched_debit_id.credit_move_id.move_id.line_ids, dmsrefnum, line_checked))
+        return journal_payment_ids
