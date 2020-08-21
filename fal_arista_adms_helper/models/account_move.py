@@ -109,6 +109,10 @@ class AccountMove(models.Model):
                 for line_to_remove in line_to_removes:
                     move_line_vals.append((2, line_to_remove))
                 move.line_ids = move_line_vals
+            # Delete 0 line
+            for line in move.line_ids:
+                if line.debit + line.credit == 0:
+                    line.unlink()
         return super(AccountMove, self).action_post()
 
     def key_maker(self, line_id):
