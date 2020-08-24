@@ -215,8 +215,7 @@ class fal_account_periods_lock_line(models.Model):
                 msg = _('There is no period defined for this date: %s.'
                         '\nPlease go to Configuration/Periods and configure '
                         'a fiscal year.') % dt
-                raise RedirectWarning(
-                    msg, action_id, _('Go to the configuration panel'))
+                raise UserError(msg)
             else:
                 return []
         return ids
