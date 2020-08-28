@@ -112,6 +112,7 @@ class IrActionsServer(models.Model):
                     result['isSuccess'] = True
                 else:
                     result['isSuccess'] = False
+                    result['ErrorMsg'] = "Journal not created. Context: %s" % (str(context))
                 return result
             if operation in [607]:
                 result['id_record'] = real_id.id or 0
@@ -121,6 +122,7 @@ class IrActionsServer(models.Model):
                     result['isSuccess'] = True
                 else:
                     result['isSuccess'] = False
+                    result['ErrorMsg'] = "Journal not created. Context: %s" % (str(context))
                 return result
             if operation in [605]:
                 result['id_record'] = real_id.id or 0
@@ -134,6 +136,7 @@ class IrActionsServer(models.Model):
                     result['isSuccess'] = True
                 else:
                     result['isSuccess'] = False
+                    result['ErrorMsg'] = "Journal not created. Context: %s" % (str(context))
                 return result
             if operation in [592]:
                 result['id_record'] = real_id.id or 0
@@ -145,6 +148,7 @@ class IrActionsServer(models.Model):
                     result['isSuccess'] = True
                 else:
                     result['isSuccess'] = False
+                    result['ErrorMsg'] = "Journal not created. Context: %s" % (str(context))
                 return result
             if operation in [608]:
                 result['id_record'] = real_id.id or 0
@@ -157,6 +161,7 @@ class IrActionsServer(models.Model):
                     result['isSuccess'] = True
                 else:
                     result['isSuccess'] = False
+                    result['ErrorMsg'] = "Journal not created. Context: %s" % (str(context))
                 return result
             if operation in [609]:
                 result['id_record'] = real_id.id or 0
@@ -169,6 +174,7 @@ class IrActionsServer(models.Model):
                     result['isSuccess'] = True
                 else:
                     result['isSuccess'] = False
+                    result['ErrorMsg'] = "Journal not created. Context: %s" % (str(context))
                 return result
             if operation in [625]:
                 result['id_record'] = real_id.id or 0
@@ -181,6 +187,7 @@ class IrActionsServer(models.Model):
                     result['isSuccess'] = True
                 else:
                     result['isSuccess'] = False
+                    result['ErrorMsg'] = "Journal not created. Context: %s" % (str(context))
                 return result
             if operation in [594]:
                 result['id_record'] = real_id.id or 0
@@ -190,6 +197,7 @@ class IrActionsServer(models.Model):
                     result['isSuccess'] = True
                 else:
                     result['isSuccess'] = False
+                    result['ErrorMsg'] = "Journal not created. Context: %s" % (str(context))
                 return result
             if operation in [596]:
                 result['id_record'] = real_id.id or 0
@@ -201,6 +209,7 @@ class IrActionsServer(models.Model):
                     result['isSuccess'] = True
                 else:
                     result['isSuccess'] = False
+                    result['ErrorMsg'] = "Journal not created. Context: %s" % (str(context))
                 return result
             if operation in [603]:
                 result['id_record'] = real_id.id or 0
@@ -212,6 +221,7 @@ class IrActionsServer(models.Model):
                     result['isSuccess'] = True
                 else:
                     result['isSuccess'] = False
+                    result['ErrorMsg'] = "Journal not created. Context: %s" % (str(context))
                 return result
             if operation in [618]:
                 result['id_record'] = real_id.id or 0
@@ -223,6 +233,7 @@ class IrActionsServer(models.Model):
                     result['isSuccess'] = True
                 else:
                     result['isSuccess'] = False
+                    result['ErrorMsg'] = "Journal not created. Context: %s" % (str(context))
                 return result
             if operation in [628]:
                 result['id_record'] = real_id.id or 0
@@ -232,6 +243,7 @@ class IrActionsServer(models.Model):
                     result['isSuccess'] = True
                 else:
                     result['isSuccess'] = False
+                    result['ErrorMsg'] = "Journal not created. Context: %s" % (str(context))
                 return result
             if operation in [631]:
                 result['id_record'] = real_id.id or 0
@@ -241,6 +253,7 @@ class IrActionsServer(models.Model):
                     result['isSuccess'] = True
                 else:
                     result['isSuccess'] = False
+                    result['ErrorMsg'] = "Journal not created. Context: %s" % (str(context))
                 return result
             if operation in [632]:
                 result['id_record'] = real_id.id or 0
@@ -252,6 +265,7 @@ class IrActionsServer(models.Model):
                     result['isSuccess'] = True
                 else:
                     result['isSuccess'] = False
+                    result['ErrorMsg'] = "Journal not created. Context: %s" % (str(context))
                 return result
             if operation in [629]:
                 result['isSuccess'] = True
