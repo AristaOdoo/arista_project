@@ -283,6 +283,14 @@ class IrActionsServer(models.Model):
                     result['total_dp'] = total_dp
                     result['total_pay'] = total_pay
                 return result
+            if operation in [566]:
+                result['id_record'] = real_id.id or 0
+                if real_id.property_account_receivable_id or real_id.property_account_payable_id or real_id.property_account_titipan_id or real_id.property_account_accrue_id:
+                    result['isSuccess'] = True
+                else:
+                    result['isSuccess'] = False
+                    result['ErrorMsg'] = "Account not Applied. Context: %s" % (str(context))
+                return result
         result['isSuccess'] = False
         result['ErrorMsg'] = 'Share ID & Branch is required'
         return result

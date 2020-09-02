@@ -270,7 +270,7 @@ class AccountMove(models.Model):
 
     # completly overide Odoo method
     def _check_fiscalyear_lock_date(self):
-        for move in self:
+        for move in self.filtered(lambda x: x.state == 'posted'):
             period_line_obj = self.env['fal.account.periods.lock.line']
             period_ids = period_line_obj.with_context(
                 company_id=move.company_id.id, fal_business_type_id=move.fal_business_type.id).find(
@@ -295,9 +295,10 @@ class AccountMove(models.Model):
         return super(AccountMove, self).copy(default=default)
 
     def action_post(self):
+        result = super(AccountMove, self).action_post()
         for move in self:
             move._check_fiscalyear_lock_date()
-        return super(AccountMove, self).action_post()
+        return result
 
 
 class AccountMoveLine(models.Model):
