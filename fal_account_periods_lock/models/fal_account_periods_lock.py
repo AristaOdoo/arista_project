@@ -263,14 +263,14 @@ class fal_account_periods_lock_line(models.Model):
 class AccountMove(models.Model):
     _inherit = "account.move"
 
-    # @api.constrains('date')
-    # def _check_lock_date_constrains(self):
-    #     # to check lock date when create move
-    #     self._check_fiscalyear_lock_date()
+    @api.constrains('date')
+    def _check_lock_date_constrains(self):
+        # to check lock date when create move
+        self._check_fiscalyear_lock_date()
 
     # completly overide Odoo method
     def _check_fiscalyear_lock_date(self):
-        for move in self:
+        for move in self.filtered(lambda x: x.state == 'posted'):
             period_line_obj = self.env['fal.account.periods.lock.line']
             period_ids = period_line_obj.with_context(
                 company_id=move.company_id.id, fal_business_type_id=move.fal_business_type.id).find(
@@ -295,23 +295,24 @@ class AccountMove(models.Model):
         return super(AccountMove, self).copy(default=default)
 
     def action_post(self):
+        result = super(AccountMove, self).action_post()
         for move in self:
             move._check_fiscalyear_lock_date()
-        return super(AccountMove, self).action_post()
+        return result
 
 
 class AccountMoveLine(models.Model):
     _inherit = 'account.move.line'
 
-    # @api.model_create_multi
-    # def create(self, vals_list):
-    #     # Check Lock Date at Creation
-    #     lines = super(AccountMoveLine, self).create(vals_list)
-    #     lines.mapped('move_id')._check_fiscalyear_lock_date()
-    #     return lines
+    @api.model_create_multi
+    def create(self, vals_list):
+        # Check Lock Date at Creation
+        lines = super(AccountMoveLine, self).create(vals_list)
+        lines.mapped('move_id')._check_fiscalyear_lock_date()
+        return lines
 
-    # def write(self, vals):
-    #     # Check Lock Date at Creation
-    #     res = super(AccountMoveLine, self).write(vals)
-    #     self.mapped('move_id')._check_fiscalyear_lock_date()
-    #     return res
+    def write(self, vals):
+        # Check Lock Date at Creation
+        res = super(AccountMoveLine, self).write(vals)
+        self.mapped('move_id')._check_fiscalyear_lock_date()
+        return res
