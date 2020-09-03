@@ -16,6 +16,18 @@ class SaleOrderLine(models.Model):
         res['discount_fixed'] = self.x_studio_adms_discount
         return res
 
+    def _check_line_unlink(self):
+        """
+        Check wether a line can be deleted or not.
+
+        Lines cannot be deleted if the order is confirmed; downpayment
+        lines who have not yet been invoiced bypass that exception.
+        :rtype: recordset sale.order.line
+        :returns: set of lines that cannot be deleted
+        """
+        # No need to check
+        return False
+
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'

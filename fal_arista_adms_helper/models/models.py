@@ -74,6 +74,10 @@ class BaseModel(models.AbstractModel):
                         for x_spk_payment in similar_adms_id.x_studio_spk_payment:
                             spk_payment_vals += [(2, x_spk_payment.id)]
                         similar_adms_id.sudo().write({'x_studio_spk_payment': spk_payment_vals})
+                    # Special for PO, we need to draft it first
+                    if model.model in ['purchase.order']:
+                        similar_adms_id.sudo().button_cancel()
+                        similar_adms_id.sudo().button_draft()
                     result = similar_adms_id.sudo().write(new_vals)
                 return similar_adms_id
             else:
