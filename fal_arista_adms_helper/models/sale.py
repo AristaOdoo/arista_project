@@ -39,4 +39,4 @@ class SaleOrder(models.Model):
         return res
 
     def _get_forbidden_state_confirm(self):
-        return {}
+        return {'none'}
