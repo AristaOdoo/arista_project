@@ -285,6 +285,11 @@ class AccountMove(models.Model):
                         "You cannot add/modify entries prior to and inclusive "
                         "of the lock date %s. Check the company settings or "
                         "ask someone with the 'Adviser' role") % lock_date)
+                if period_ids[0].state == 'done':
+                    raise UserError(_(
+                        "You cannot add/modify entries within the entries date period."
+                        "The period is not open. Check the company settings or "
+                        "ask someone with the 'Adviser' role"))
         return True
 
     @api.returns('self', lambda value: value.id)
