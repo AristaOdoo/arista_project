@@ -151,9 +151,6 @@ class Move(models.AbstractModel):
                     # It's always the 18th word
                     field_name = key[17:]
                     field = self.env['ir.model.fields'].search([('model_id', '=', model.id), ('name', '=', field_name)])
-                    print("XXXXXXXXXXXXXXXXXXXXXXXXXXX")
-                    print(field.relation)
-                    print(vals[key])
                     real_id = self.env[field.relation].search([('x_studio_adms_id', '=', vals[key])], limit=1)
                     new_vals[key[17:]] = real_id.id
                     new_vals[key] = vals[key]

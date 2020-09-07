@@ -271,6 +271,8 @@ class AccountMove(models.Model):
     # completly overide Odoo method
     def _check_fiscalyear_lock_date(self):
         if self.env.context.get('check_date'):
+            err_message = False
+            move_to_unlink = []
             for move in self:
                 period_line_obj = self.env['fal.account.periods.lock.line']
                 period_ids = period_line_obj.with_context(
@@ -282,15 +284,22 @@ class AccountMove(models.Model):
                         lock_date = period_ids[0].adviser_locking_date
                     lckdt = lock_date
                     if fields.date.today() >= lckdt:
-                        raise UserError(_(
+                        move_to_unlink.append(move.id)
+                        err_message = _(
                             "You cannot add/modify entries prior to and inclusive "
                             "of the lock date %s. Check the company settings or "
-                            "ask someone with the 'Adviser' role") % lock_date)
+                            "ask someone with the 'Adviser' role") % lock_date
                     if period_ids[0].state == 'done':
-                        raise UserError(_(
+                        move_to_unlink.append(move.id)
+                        err_message = _(
                             "You cannot add/modify entries within the entries date period."
                             "The period is not open. Check the company settings or "
-                            "ask someone with the 'Adviser' role"))
+                            "ask someone with the 'Adviser' role")
+            if err_message:
+                for move in move_to_unlink:
+                    self.env['account.move'].browse(move).with_context(check_date=False).unlink()
+                raise UserError(err_message)
+
         return True
 
     @api.returns('self', lambda value: value.id)
