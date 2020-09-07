@@ -270,26 +270,27 @@ class AccountMove(models.Model):
 
     # completly overide Odoo method
     def _check_fiscalyear_lock_date(self):
-        for move in self.filtered(lambda x: x.state == 'posted'):
-            period_line_obj = self.env['fal.account.periods.lock.line']
-            period_ids = period_line_obj.with_context(
-                company_id=move.company_id.id, fal_business_type_id=move.fal_business_type.id).find(
-                dt=move.date)
-            if period_ids:
-                lock_date = period_ids[0].non_adviser_locking_date
-                if self.user_has_groups('account.group_account_manager'):
-                    lock_date = period_ids[0].adviser_locking_date
-                lckdt = lock_date
-                if fields.date.today() >= lckdt:
-                    raise UserError(_(
-                        "You cannot add/modify entries prior to and inclusive "
-                        "of the lock date %s. Check the company settings or "
-                        "ask someone with the 'Adviser' role") % lock_date)
-                if period_ids[0].state == 'done':
-                    raise UserError(_(
-                        "You cannot add/modify entries within the entries date period."
-                        "The period is not open. Check the company settings or "
-                        "ask someone with the 'Adviser' role"))
+        if self.env.context.get('check_date'):
+            for move in self:
+                period_line_obj = self.env['fal.account.periods.lock.line']
+                period_ids = period_line_obj.with_context(
+                    company_id=move.company_id.id, fal_business_type_id=move.fal_business_type.id).find(
+                    dt=move.date)
+                if period_ids:
+                    lock_date = period_ids[0].non_adviser_locking_date
+                    if self.user_has_groups('account.group_account_manager'):
+                        lock_date = period_ids[0].adviser_locking_date
+                    lckdt = lock_date
+                    if fields.date.today() >= lckdt:
+                        raise UserError(_(
+                            "You cannot add/modify entries prior to and inclusive "
+                            "of the lock date %s. Check the company settings or "
+                            "ask someone with the 'Adviser' role") % lock_date)
+                    if period_ids[0].state == 'done':
+                        raise UserError(_(
+                            "You cannot add/modify entries within the entries date period."
+                            "The period is not open. Check the company settings or "
+                            "ask someone with the 'Adviser' role"))
         return True
 
     @api.returns('self', lambda value: value.id)
@@ -300,9 +301,9 @@ class AccountMove(models.Model):
         return super(AccountMove, self).copy(default=default)
 
     def action_post(self):
-        result = super(AccountMove, self).action_post()
         for move in self:
-            move._check_fiscalyear_lock_date()
+            move.with_context(check_date=True)._check_fiscalyear_lock_date()
+        result = super(AccountMove, self).action_post()
         return result
 
 
