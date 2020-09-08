@@ -283,7 +283,7 @@ class account_register_payments(models.TransientModel):
         # Apply new line to move
         moves.write({'line_ids': main_journal_change})
         # Reconcile
-        moves.filtered(lambda move: move.journal_id.post_at != 'bank_rec').post()
+        moves.filtered(lambda move: move.journal_id.post_at != 'bank_rec').action_post()
         for payment in self:
             for rec in payment.payment_wizard_line_ids:
                 for line in moves.line_ids.filtered(lambda a: a.name.split(":")[-1] == ' ' + rec.invoice_ids[0].name and a.account_internal_type in ['receivable', 'payable']):
@@ -470,7 +470,7 @@ class fal_multi_payment_wizard(models.TransientModel):
         payments = Payment
         for payment_vals in self.get_payments_vals():
             payments += Payment.create(payment_vals)
-        payments.post()
+        payments.action_post()
 
         action_vals = {
             'name': _('Payments'),
