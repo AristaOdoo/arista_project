@@ -294,6 +294,26 @@ class AccountMove(models.Model):
                             "ask someone with the 'Adviser' role"))
         return True
 
+    def check_fiscalyear_lock_date_method(self, company_id=False, fal_business_type_id=False, date=False):
+        if company_id and fal_business_type_id and date:
+            period_line_obj = self.env['fal.account.periods.lock.line']
+            period_ids = period_line_obj.with_context(
+                company_id=company_id.id, fal_business_type_id=fal_business_type_id.id).find(
+                dt=date, exception=False)
+            if period_ids:
+                lock_date = period_ids[0].non_adviser_locking_date
+                if self.user_has_groups('account.group_account_manager'):
+                    lock_date = period_ids[0].adviser_locking_date
+                lckdt = lock_date
+                if fields.date.today() >= lckdt:
+                    return False
+                if period_ids[0].state == 'done':
+                    return False
+            else:
+                return False
+            return True
+        return False
+
     @api.returns('self', lambda value: value.id)
     def copy(self, default=None):
         default = default or {}
