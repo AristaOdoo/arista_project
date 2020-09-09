@@ -98,10 +98,20 @@ class payment_register(models.Model):
                     communication = ','.join(list_ref)
                 inv_type = MAP_INVOICE_TYPE_PAYMENT_SIGN[invoice.type]
                 total_amount = invoice.amount_residual * inv_type
+                # Don't know why but the amount residual is wrong if not from the
+                # real object
+                invoice_obj = self.env['account.move'].search([
+                    ('name', '=', invoices.name),
+                    ('company_id', '=', invoices.company_id.id),
+                    ('fal_business_type', '=', invoices.fal_business_type.id)
+                ], limit=1)
+                amount_residual_signed = 0
+                if invoice_obj:
+                    amount_residual_signed = invoice_obj.amount_residual
                 temp.append((0, 0, {
                     'partner_id': invoices.commercial_partner_id.id or invoices.partner_id.id,
                     'partner_type': MAP_INVOICE_TYPE_PARTNER_TYPE[invoices[0].type],
-                    'amount': abs(invoices.amount_residual),
+                    'amount': amount_residual_signed or abs(invoices.amount_residual_signed),
                     'currency_id': currency,
                     'payment_type': 'inbound' if total_amount > 0 else 'outbound',
                     'payment_date': fields.date.today(),
