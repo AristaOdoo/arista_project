@@ -40,6 +40,7 @@ class AccountMove(models.Model):
                     vals = {
                         'name': move_line.name,
                         'company_id': move_line.company_id.id,
+                        'x_studio_business_type': move_line.fal_business_type.id,
                         'currency_id': move_line.company_currency_id.id,
                         'original_move_line_ids': [(6, False, move_line.ids)],
                         'state': 'draft',
