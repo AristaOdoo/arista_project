@@ -285,7 +285,7 @@ class IrActionsServer(models.Model):
                 return result
             if operation in [566]:
                 result['id_record'] = real_id.id or 0
-                if real_id.property_account_receivable_id or real_id.property_account_payable_id or real_id.property_account_titipan_id or real_id.property_account_accrue_id:
+                if real_id.with_context(force_company=company.id, force_business_type=business_type.id).property_account_receivable_id or real_id.with_context(force_company=company.id, force_business_type=business_type.id).property_account_payable_id or real_id.with_context(force_company=company.id, force_business_type=business_type.id).property_account_titipan_id or real_id.with_context(force_company=company.id, force_business_type=business_type.id).property_account_accrue_id:
                     result['isSuccess'] = True
                 else:
                     result['isSuccess'] = False
