@@ -56,6 +56,10 @@ class BaseModel(models.AbstractModel):
             # Means do nothing
             elif model.model in ['x_reason_adms']:
                 pass
+            # Special case for x_customer_vendor_group_branch_dependant, remove fal_business_type
+            # So that only company value is filled
+            elif model.model in ['x_customer_vendor_group_branch_dependant']:
+                new_vals.pop('fal_business_type', None)
             elif business_type_field and model.model not in model_exception:
                 domain += [(business_type_field.name, '=', new_vals[business_type_field.name])]
             similar_adms_id = self.sudo().search(domain)
