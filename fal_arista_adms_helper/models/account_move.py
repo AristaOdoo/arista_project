@@ -2,6 +2,7 @@
 from odoo import api, fields, models, SUPERUSER_ID, _
 from odoo.exceptions import UserError
 from num2words import num2words
+from odoo.tools import float_is_zero, float_compare, safe_eval, date_utils, email_split, email_escape_char, email_re
 
 
 class AccountMove(models.Model):
@@ -139,3 +140,43 @@ class AccountMove(models.Model):
                         journal_payment_ids.append(matched_debit_id.credit_move_id.id)
                         journal_payment_ids.extend(line.move_id.get_line_ids(matched_debit_id.credit_move_id.move_id.line_ids, dmsrefnum, line_checked))
         return journal_payment_ids
+
+    def _get_reconciled_info_JSON_values(self):
+        self.ensure_one()
+        foreign_currency = self.currency_id if self.currency_id != self.company_id.currency_id else False
+
+        reconciled_vals = []
+        pay_term_line_ids = self.line_ids.filtered(lambda line: line.account_id.user_type_id.type in ('receivable', 'payable'))
+        partials = pay_term_line_ids.mapped('matched_debit_ids') + pay_term_line_ids.mapped('matched_credit_ids')
+        for partial in partials:
+            counterpart_lines = partial.debit_move_id + partial.credit_move_id
+            counterpart_line_list = counterpart_lines.filtered(lambda line: line not in self.line_ids)
+
+            for counterpart_line in counterpart_line_list:
+                if foreign_currency and partial.currency_id == foreign_currency:
+                    amount = partial.amount_currency
+                else:
+                    amount = partial.company_currency_id._convert(partial.amount, self.currency_id, self.company_id, self.date)
+
+                if float_is_zero(amount, precision_rounding=self.currency_id.rounding):
+                    continue
+
+                ref = counterpart_line.move_id.name
+                if counterpart_line.move_id.ref:
+                    ref += ' (' + counterpart_line.move_id.ref + ')'
+
+                reconciled_vals.append({
+                    'name': counterpart_line.name,
+                    'journal_name': counterpart_line.journal_id.name,
+                    'amount': amount,
+                    'currency': self.currency_id.symbol,
+                    'digits': [69, self.currency_id.decimal_places],
+                    'position': self.currency_id.position,
+                    'date': counterpart_line.date,
+                    'payment_id': counterpart_line.id,
+                    'account_payment_id': counterpart_line.payment_id.id,
+                    'payment_method_name': counterpart_line.payment_id.payment_method_id.name if counterpart_line.journal_id.type == 'bank' else None,
+                    'move_id': counterpart_line.move_id.id,
+                    'ref': ref,
+                })
+        return reconciled_vals
