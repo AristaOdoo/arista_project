@@ -39,15 +39,18 @@ class MassGenerateAPVOModel(models.Model):
                     purchase_line.taxes_id = [(6, 0, [])]
             if self.account_id:
                 purchase_order_id.x_studio_variance_unit_account = self.account_id.id
+        with_tax = False
+        if self.taxes_id:
+            with_tax = True
         if self.apvo_type == '1':
             sa_mass_APVO = self.env['ir.actions.server'].browse(633)
             ctx = dict(self.env.context or {})
-            ctx.update({'mapvo_adms_id': self.mass_apvo_sequence or '', 'text': self.text or '', 'date': self.date, 'active_ids': self.purchase_order_ids.ids, 'active_model': 'purchase.order'})
+            ctx.update({'mapvo_adms_id': self.mass_apvo_sequence or '', 'text': self.text or '', 'date': self.date, 'active_ids': self.purchase_order_ids.ids, 'active_model': 'purchase.order', 'with_tax': with_tax})
             sa_mass_APVO.with_context(ctx).run()
         else:
             sa_mass_APVO_retur = self.env['ir.actions.server'].browse(639)
             ctx = dict(self.env.context or {})
-            ctx.update({'mapvo_adms_id': self.mass_apvo_sequence or '', 'text': self.text or '', 'date': self.date, 'active_ids': self.purchase_order_ids.ids, 'active_model': 'purchase.order'})
+            ctx.update({'mapvo_adms_id': self.mass_apvo_sequence or '', 'text': self.text or '', 'date': self.date, 'active_ids': self.purchase_order_ids.ids, 'active_model': 'purchase.order', 'with_tax': with_tax})
             sa_mass_APVO_retur.with_context(ctx).run()
         self.used = True
         self.state = 'post'
