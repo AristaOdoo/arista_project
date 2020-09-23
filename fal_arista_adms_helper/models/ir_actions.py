@@ -291,6 +291,45 @@ class IrActionsServer(models.Model):
                     result['isSuccess'] = False
                     result['ErrorMsg'] = "Account not Applied. Context: %s" % (str(context))
                 return result
+            if operation in [732]:
+                result['id_record'] = real_id.id or 0
+                result['id_bon_merah'] = real_id.x_studio_bon_merah and real_id.x_studio_bon_merah.id or 0
+                result['bon_merah'] = real_id.x_studio_bon_merah and real_id.x_studio_bon_merah.x_studio_nomor_bon or ''
+                result['id_nomor_voucher'] = real_id.x_studio_bon_merah and real_id.x_studio_bon_merah.id or 0
+                result['nomor_voucher'] = real_id.x_studio_bon_merah and real_id.x_studio_bon_merah.name or ''
+                result['ar_customer'] = real_id.x_studio_customer_account or ''
+                if real_id.x_studio_bon_merah:
+                    result['isSuccess'] = True
+                else:
+                    result['isSuccess'] = False
+                    result['ErrorMsg'] = "Journal not created. Context: %s" % (str(context))
+                return result
+            if operation in [731]:
+                result['id_record'] = real_id.id or 0
+                result['id_bon_merah'] = real_id.x_studio_bon_merah and real_id.x_studio_bon_merah.id or 0
+                result['bon_merah'] = real_id.x_studio_bon_merah and real_id.x_studio_bon_merah.x_studio_nomor_bon or ''
+                result['id_nomor_voucher'] = real_id.x_studio_bon_merah and real_id.x_studio_bon_merah.id or 0
+                result['nomor_voucher'] = real_id.x_studio_bon_merah and real_id.x_studio_bon_merah.name or ''
+                result['ar_customer'] = real_id.x_studio_customer_account or ''
+                if real_id.x_studio_bon_merah:
+                    result['isSuccess'] = True
+                else:
+                    result['isSuccess'] = False
+                    result['ErrorMsg'] = "Journal not created. Context: %s" % (str(context))
+                return result
+            if operation in [733]:
+                result['id_record'] = real_id.id or 0
+                result['id_bon_hijau'] = real_id.x_studio_bon_hijau and real_id.x_studio_bon_hijau.id or 0
+                result['bon_hijau'] = real_id.x_studio_bon_hijau and real_id.x_studio_bon_hijau.x_studio_nomor_bon or ''
+                result['id_nomor_voucher'] = real_id.x_studio_bon_hijau and real_id.x_studio_bon_hijau.id or 0
+                result['nomor_voucher'] = real_id.x_studio_bon_hijau and real_id.x_studio_bon_hijau.name or ''
+                result['ar_customer'] = real_id.x_studio_customer_account or ''
+                if real_id.x_studio_bon_hijau:
+                    result['isSuccess'] = True
+                else:
+                    result['isSuccess'] = False
+                    result['ErrorMsg'] = "Journal not created. Context: %s" % (str(context))
+                return result
         result['isSuccess'] = False
         result['ErrorMsg'] = 'Share ID & Branch is required'
         return result
