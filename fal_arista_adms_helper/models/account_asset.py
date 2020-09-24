@@ -23,3 +23,10 @@ class AccountAsset(models.Model):
             self.account_depreciation_id = model.account_depreciation_id
             self.account_depreciation_expense_id = model.account_depreciation_expense_id
             self.journal_id = model.journal_id
+
+    # No need to block these
+    @api.constrains('active', 'state')
+    def _check_active(self):
+        for record in self:
+            if not record.active and record.state != 'close':
+                continue
