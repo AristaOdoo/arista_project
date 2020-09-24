@@ -266,7 +266,7 @@ class AccountMove(models.Model):
     @api.constrains('date')
     def _check_lock_date_constrains(self):
         # to check lock date when create move
-        self._check_fiscalyear_lock_date()
+        return True
 
     # completly overide Odoo method
     def _check_fiscalyear_lock_date(self):
@@ -330,16 +330,3 @@ class AccountMove(models.Model):
 
 class AccountMoveLine(models.Model):
     _inherit = 'account.move.line'
-
-    @api.model_create_multi
-    def create(self, vals_list):
-        # Check Lock Date at Creation
-        lines = super(AccountMoveLine, self).create(vals_list)
-        lines.mapped('move_id')._check_fiscalyear_lock_date()
-        return lines
-
-    def write(self, vals):
-        # Check Lock Date at Creation
-        res = super(AccountMoveLine, self).write(vals)
-        self.mapped('move_id')._check_fiscalyear_lock_date()
-        return res
