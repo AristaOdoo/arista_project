@@ -317,7 +317,7 @@ class IrActionsServer(models.Model):
                     result['isSuccess'] = False
                     result['ErrorMsg'] = "Journal not created. Context: %s" % (str(context))
                 return result
-            if operation in [713]:
+            if operation in [719]:
                 result['id_record'] = real_id.id or 0
                 result['id_bon_hijau'] = real_id.x_studio_bon_hijau and real_id.x_studio_bon_hijau.id or 0
                 result['bon_hijau'] = real_id.x_studio_bon_hijau and real_id.x_studio_bon_hijau.x_studio_nomor_bon or ''
