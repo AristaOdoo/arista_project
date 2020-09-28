@@ -595,6 +595,16 @@ class BiSQLView(models.Model):
         return columns
 
     @api.model
+    def refresh_materialized_view_cron(self, view_ids):
+        sql_views = self.search([
+            ('is_materialized', '=', True),
+            ('state', 'in', ['model_valid', 'ui_valid']),
+            ('id', 'in', view_ids),
+        ])
+        sql_views._refresh_materialized_view()
+        return True
+
+    @api.model
     def _refresh_materialized_view_cron(self, view_ids):
         sql_views = self.search([
             ('is_materialized', '=', True),
