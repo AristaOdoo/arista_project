@@ -30,3 +30,11 @@ class AccountAsset(models.Model):
         for record in self:
             if not record.active and record.state != 'close':
                 continue
+
+    @api.depends('value_residual', 'salvage_value', 'children_ids.book_value')
+    def _compute_book_value(self):
+        for record in self:
+            # Change on Arista
+            # They want book value not to count salvage
+            record.book_value = record.value_residual + sum(record.children_ids.mapped('book_value'))
+            record.gross_increase_value = sum(record.children_ids.mapped('original_value'))
