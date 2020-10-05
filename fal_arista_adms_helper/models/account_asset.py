@@ -7,6 +7,8 @@ from num2words import num2words
 class AccountAsset(models.Model):
     _inherit = 'account.asset'
 
+    accumulated_value = fields.Monetary(string="Accumulated Value", readonly=True, compute='_compute_accumulated_value', store=True, help="Sum of the posted depreciable value")
+
     @api.onchange('model_id')
     def _onchange_model_id(self):
         model = self.model_id
@@ -38,3 +40,13 @@ class AccountAsset(models.Model):
             # They want book value not to count salvage
             record.book_value = record.value_residual + sum(record.children_ids.mapped('book_value'))
             record.gross_increase_value = sum(record.children_ids.mapped('original_value'))
+
+    @api.depends('children_ids.book_value')
+    def _compute_accumulated_value(self):
+        for record in self:
+            for children_id in record.children_ids:
+                record.accumulated_value = sum(record.depreciation_move_ids.filtered(lambda x: x.state == 'posted').mapped('amount_total'))
+
+    def manual_compute_accumulated_value(self):
+        for record in self:
+            record._compute_accumulated_value()
