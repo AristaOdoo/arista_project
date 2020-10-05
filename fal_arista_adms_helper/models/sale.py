@@ -53,7 +53,8 @@ class SaleOrder(models.Model):
     def _prepare_invoice(self):
         self.ensure_one()
         res = super(SaleOrder, self)._prepare_invoice()
-        res['invoice_date'] = self.x_studio_transdate_adms
+        res['invoice_date'] = self.x_studio_invoicedate or self.x_studio_transdate_adms or fields.Datetime.now()
+        res['date'] = self.x_studio_invoicedate or self.x_studio_transdate_adms or fields.Datetime.now()
         return res
 
     def _get_forbidden_state_confirm(self):
