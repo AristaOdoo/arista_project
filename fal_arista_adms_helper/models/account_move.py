@@ -90,7 +90,7 @@ class AccountMove(models.Model):
                 product_to_updates = {}
                 line_to_removes = []
                 for move_line in move.line_ids:
-                    if move_line.product_id and move_line.product_id.x_studio_adms_id != '99':
+                    if (move_line.account_id.x_studio_is_bank) or (move_line.product_id and move_line.product_id.x_studio_adms_id != '99'):
                         key = move.key_maker(move_line)
                         if key not in product_to_updates:
                             product_to_updates[key] = {
