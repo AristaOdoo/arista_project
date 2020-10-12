@@ -1,4 +1,4 @@
-from odoo import api, fields, models, _
+from odoo import api, fields, models, tools, _
 import ast
 from odoo.exceptions import UserError
 
@@ -62,7 +62,8 @@ class MassGenerateAPVOModel(models.Model):
             user_id = self.env['res.users'].browse(self.env.uid)
             business_type = user_id.fal_business_type_id
         p_journal = self.env['account.journal'].sudo().search([('type', '=', 'purchase'), ('fal_business_type', '=', business_type.id), ('x_studio_arista_code', '=', 'AP-VO')])
-        nomor = p_journal.sequence_id.with_context(ir_sequence_date=vals['date']).next_by_id(sequence_date=vals['date'])
+        date = fields.datetime.strptime(vals['date'], tools.DEFAULT_SERVER_DATE_FORMAT).date()
+        nomor = p_journal.sequence_id.with_context(ir_sequence_date=vals['date']).next_by_id(sequence_date=date)
         if nomor:
             vals['mass_apvo_sequence'] = nomor
         return super(MassGenerateAPVOModel, self).create(vals)
