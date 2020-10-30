@@ -111,6 +111,32 @@ class AccountMove(models.Model):
                 for line_to_remove in line_to_removes:
                     move_line_vals.append((2, line_to_remove))
                 move.line_ids = move_line_vals
+            elif self.env.context.get('mapvo_combine_account', False):
+                # Special on mapvo, the accure account is combined based on dmsrefnum
+                product_to_updates = {}
+                line_to_removes = []
+                for move_line in move.line_ids:
+                    if (move_line.account_id.x_studio_is_bank) or (move_line.product_id and move_line.product_id.x_studio_adms_id != '99'):
+                        key = move.key_maker_mapvo(move_line)
+                        if key not in product_to_updates:
+                            product_to_updates[key] = {
+                                'move_line_id': move_line.id,
+                                'debit': move_line.debit,
+                                'credit': move_line.credit,
+                            }
+                        else:
+                            product_to_updates[key]['debit'] = product_to_updates[key]['debit'] + move_line.debit
+                            product_to_updates[key]['credit'] = product_to_updates[key]['credit'] + move_line.credit
+                            line_to_removes.append(move_line.id)
+                move_line_vals = []
+                for product_to_update in product_to_updates:
+                    move_line_vals.append((1, product_to_updates[product_to_update]['move_line_id'], {
+                        'debit': product_to_updates[product_to_update]['debit'],
+                        'credit': product_to_updates[product_to_update]['credit']
+                        }))
+                for line_to_remove in line_to_removes:
+                    move_line_vals.append((2, line_to_remove))
+                move.line_ids = move_line_vals
             # Delete 0 line
             for line in move.line_ids:
                 if line.debit + line.credit == 0:
@@ -119,6 +145,9 @@ class AccountMove(models.Model):
 
     def key_maker(self, line_id):
         return ("d" if line_id.debit else "c") + "|" + str(line_id.account_id.id)
+
+    def key_maker_mapvo(self, line_id):
+        return ("d" if line_id.debit else "c") + "|" + str(line_id.account_id.id) + "|" + str(line_id.x_studio_per_line_dmsrefnum)
 
     def get_line_ids(self, move_line_ids, dmsrefnum, line_checked):
         journal_payment_ids = []
