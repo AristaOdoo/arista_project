@@ -90,6 +90,8 @@
                                 <field name="account_id" domain="[('company_id', '=', parent.company_id),('id', '!=', parent.forbidden_account)]"/>
                                 <field name="partner_id" domain="[('fal_business_type', '=', parent.fal_business_type)]"/>
                                 <field name="name" required="1"/>
+                                <field name="x_product_dimension_id"/>
+                                <field name="x_studio_department_id"/>
                                 <field name="debit" sum="Total"/>
                                 <field name="credit" sum="Total"/>
                             </tree>
@@ -198,6 +200,8 @@
                                 <field name="account_id" domain="[('company_id', '=', parent.company_id),('id', '!=', parent.forbidden_account)]"/>
                                 <field name="partner_id" domain="[('fal_business_type', '=', parent.fal_business_type)]"/>
                                 <field name="name" required="1"/>
+                                <field name="x_product_dimension_id"/>
+                                <field name="x_studio_department_id"/>
                                 <field name="debit" sum="Total"/>
                                 <field name="credit" sum="Total"/>
                             </tree>
@@ -305,6 +309,8 @@
                                 <field name="fal_business_type"/>
                                 <field name="account_id" domain="[('company_id', '=', parent.company_id),('id', '!=', parent.forbidden_account)]"/>
                                 <field name="partner_id" domain="[('fal_business_type', '=', parent.fal_business_type)]"/>
+                                <field name="x_product_dimension_id"/>
+                                <field name="x_studio_department_id"/>
                                 <field name="name" required="1"/>
                                 <field name="debit" sum="Total"/>
                                 <field name="credit" sum="Total"/>
@@ -414,6 +420,8 @@
                                 <field name="account_id" domain="[('company_id', '=', parent.company_id),('id', '!=', parent.forbidden_account)]"/>
                                 <field name="partner_id" domain="[('fal_business_type', '=', parent.fal_business_type)]"/>
                                 <field name="name" required="1"/>
+                                <field name="x_product_dimension_id"/>
+                                <field name="x_studio_department_id"/>
                                 <field name="debit" sum="Total"/>
                                 <field name="credit" sum="Total"/>
                             </tree>
