@@ -194,6 +194,8 @@ class account_register_payments(models.TransientModel):
                     'credit': extra_line.credit,
                     'partner_id': extra_line.partner_id.id,
                     'account_id': extra_line.account_id.id,
+                    'product_dimension_id': extra_line.x_product_dimension_id and extra_line.x_product_dimension_id.id or False,
+                    'x_studio_department': extra_line.x_studio_department_id and extra_line.x_studio_department_id.id or False,
                 }))
             if self.payment_method_id.payment_type == 'inbound':
                 extra_line_value += extra_line.credit - extra_line.debit
@@ -499,3 +501,5 @@ class fal_multi_payment_wizard_extra_lines(models.TransientModel):
     name = fields.Char("Name")
     debit = fields.Float(string='Debit', default=0.0)
     credit = fields.Float(string='Credit', default=0.0)
+    x_product_dimension_id = fields.Many2one('x_product_dimension')
+    x_studio_department_id = fields.Many2one('x_studio_department')

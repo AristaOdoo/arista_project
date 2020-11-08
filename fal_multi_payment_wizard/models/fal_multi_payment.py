@@ -276,6 +276,9 @@ class payment_register(models.Model):
                 'name': extra_line.name,
                 'debit': extra_line.debit,
                 'credit': extra_line.credit,
+                'x_product_dimension_id': extra_line.x_product_dimension_id and extra_line.x_product_dimension_id.id or False,
+                'x_studio_department_id': extra_line.x_studio_department_id and extra_line.x_studio_department_id.id or False,
+
             }))
         apr_vals = {
             'payment_date': self.payment_date,
@@ -330,6 +333,8 @@ class fal_multi_payment_wizard_extra_lines(models.Model):
     name = fields.Char("Name")
     debit = fields.Float(string='Debit', default=0.0)
     credit = fields.Float(string='Credit', default=0.0)
+    x_product_dimension_id = fields.Many2one('x_product_dimension', 'Product Dimension')
+    x_studio_department_id = fields.Many2one('x_studio_department', 'Department')
 
     _sql_constraints = [
         (
