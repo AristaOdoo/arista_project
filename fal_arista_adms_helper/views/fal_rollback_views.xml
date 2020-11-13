@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_x_rollback_adms_tree" model="ir.ui.view">
+            <field name="name">x_rollback_adms_tree</field>
+            <field name="model">x_rollback_adms</field>
+            <field name="arch" type="xml">
+                <tree string="Rollback ADMS">
+                    <field name="model_id"/>
+                    <field name="record_ids"/>
+                    <field name="method_number"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_x_rollback_adms_form" model="ir.ui.view">
+            <field name="name">x_rollback_adms_form</field>
+            <field name="model">x_rollback_adms</field>
+            <field name="arch" type="xml">
+                <form string="Rollback ADMS">
+                    <sheet>
+                        <group>
+                            <field name="model_id"/>
+                            <field name="record_ids"/>
+                            <field name="method_number"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_x_rollback_adms_action" model="ir.actions.act_window">
+            <field name="name">Rollback ADMS</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">x_rollback_adms</field>
+            <field name="view_mode">tree,form</field>
+            <field name="target">current</field>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Rollback ADMS.
+              </p>
+            </field>
+        </record>
+
+        <menuitem action="view_x_rollback_adms_action" id="fal_menu_x_rollback_adms"
+            parent="base.next_id_9" name="Rollback ADMS"
+            sequence="20" />
+    </data>
+</odoo>

@@ -15,3 +15,4 @@ from . import product
 from . import sale
 from . import mass_generate_apvo
 from . import ir_sequence
+from . import fal_rollback
