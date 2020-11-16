@@ -5,3 +5,4 @@ access_x_no_rangka,access_x_no_rangka,model_x_no_rangka,base.group_user,1,1,1,1
 access_x_product_dimension,access_x_product_dimension,model_x_product_dimension,base.group_user,1,1,1,1
 access_x_reason_adms,access_x_reason_adms,model_x_reason_adms,base.group_user,1,1,1,1
 access_mass_generate_apvo_model,access_mass_generate_apvo_model,model_mass_generate_apvo_model,base.group_user,1,1,1,1
+access_x_rollback_adms_model,access_x_rollback_adms_model,model_x_rollback_adms,base.group_user,1,1,1,1

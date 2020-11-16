@@ -130,9 +130,9 @@ class IrActionsServer(models.Model):
                 result['issue_journal'] = real_id.x_studio_issue_entry and real_id.x_studio_issue_entry.name or ''
                 result['id_transfer_journal'] = real_id.x_studio_transfer_journal and real_id.x_studio_transfer_journal.id or 0
                 result['transfer_journal'] = real_id.x_studio_transfer_journal and real_id.x_studio_transfer_journal.name or ''
-                result['id_invoice_journal'] = real_id.invoice_ids[0] and real_id.invoice_ids[0].id or 0
-                result['invoice_journal'] = real_id.invoice_ids[0] and real_id.invoice_ids[0].name or ''
-                if real_id.x_studio_issue_entry or real_id.x_studio_transfer_journal or real_id.invoice_ids[0]:
+                result['id_invoice_journal'] = real_id.invoice_ids and real_id.invoice_ids[0] and real_id.invoice_ids[0].id or 0
+                result['invoice_journal'] = real_id.invoice_ids and real_id.invoice_ids[0] and real_id.invoice_ids[0].name or ''
+                if real_id.x_studio_issue_entry or real_id.x_studio_transfer_journal or (real_id.invoice_ids and real_id.invoice_ids[0]):
                     result['isSuccess'] = True
                 else:
                     result['isSuccess'] = False
@@ -142,9 +142,9 @@ class IrActionsServer(models.Model):
                 result['id_record'] = real_id.id or 0
                 result['id_issue_journal'] = real_id.x_studio_issue_entry and real_id.x_studio_issue_entry.id or 0
                 result['issue_journal'] = real_id.x_studio_issue_entry and real_id.x_studio_issue_entry.name or ''
-                result['id_invoice_journal'] = real_id.invoice_ids[0] and real_id.invoice_ids[0].id or 0
-                result['invoice_journal'] = real_id.invoice_ids[0] and real_id.invoice_ids[0].name or ''
-                if real_id.x_studio_issue_entry or real_id.invoice_ids[0]:
+                result['id_invoice_journal'] = real_id.invoice_ids and real_id.invoice_ids[0] and real_id.invoice_ids[0].id or 0
+                result['invoice_journal'] = real_id.invoice_ids and real_id.invoice_ids[0] and real_id.invoice_ids[0].name or ''
+                if real_id.x_studio_issue_entry or (real_id.invoice_ids and real_id.invoice_ids[0]):
                     result['isSuccess'] = True
                 else:
                     result['isSuccess'] = False
