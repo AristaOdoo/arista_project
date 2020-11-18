@@ -183,7 +183,7 @@ class payment_register(models.Model):
     total_payment = fields.Float('Total Payment', compute="_get_total_payment")
     forbidden_account = fields.Integer('Forbidden Account', compute="_get_forbidden_account")
     bon_id = fields.Many2one('account.move', 'Bon')
-    nomor_bon = fields.Char('Nomor Bon', related="bon_id.x_studio_nomor_bon")
+    nomor_bon = fields.Char('Nomor Bon', related="bon_id.x_studio_nomor_bon", store=True)
     partner_name = fields.Char("Partner Name", compute="_get_partner_name")
     account_move_type = fields.Selection([
         ('out_invoice', 'Customer Invoice'),
