@@ -48,7 +48,6 @@ class payment_register(models.Model):
                 total_payment += debit - credit
             else:
                 total_payment += credit - debit
-
             aprm.total_payment = total_payment
 
     def _get_partner_name(self):
