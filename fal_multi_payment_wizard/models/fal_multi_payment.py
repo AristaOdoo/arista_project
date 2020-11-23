@@ -31,6 +31,7 @@ class payment_register(models.Model):
     _name = 'account.payment.register.model'
     _description = 'Register Payment'
 
+    @api.depends('payment_wizard_line_ids', 'extra_lines', 'payment_type')
     def _get_total_payment(self):
         for aprm in self:
             total_payment = 0
