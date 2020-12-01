@@ -326,7 +326,7 @@ class fal_multi_payment_wizard_extra_lines(models.Model):
 
     account_id = fields.Many2one('account.account', required=True)
     company_id = fields.Many2one('res.company', 'Company', related="register_payments_id.company_id")
-    fal_business_type = fields.Many2one('fal.business.type', related="account_id.fal_business_type")
+    fal_business_type = fields.Many2one('fal.business.type', related="account_id.fal_business_type", store=True)
     register_payments_id = fields.Many2one(
         'account.payment.register.model', 'Payment List')
     partner_id = fields.Many2one('res.partner')
