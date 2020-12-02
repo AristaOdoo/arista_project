@@ -314,13 +314,6 @@ class AccountMove(models.Model):
             return True
         return False
 
-    @api.returns('self', lambda value: value.id)
-    def copy(self, default=None):
-        default = default or {}
-        # Duplicated Date should be today's date
-        default['date'] = fields.Datetime.now()
-        return super(AccountMove, self).copy(default=default)
-
     def action_post(self):
         for move in self:
             move.with_context(force_check=True)._check_fiscalyear_lock_date()
