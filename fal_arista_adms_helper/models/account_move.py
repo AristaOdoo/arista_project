@@ -209,3 +209,16 @@ class AccountMove(models.Model):
                     'ref': ref,
                 })
         return reconciled_vals
+
+    @api.model
+    def _autopost_draft_entries(self):
+        '''
+            Change Odoo standard, as Odoo will try to auto post entries with asset that is archived
+        '''
+        records = self.search([
+            ('state', '=', 'draft'),
+            ('date', '<=', fields.Date.today()),
+            ('auto_post', '=', True),
+            ('asset_id.active', '=', True)
+        ])
+        records.post()
