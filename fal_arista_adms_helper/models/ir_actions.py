@@ -95,7 +95,7 @@ class IrActionsServer(models.Model):
                 result['ErrorMsg'] = "Record not found. Model: %s, Business Type Field: %s, Company Field %s, Business Type: %s, Company: %s" % (model.model, business_type_field, company_type_field, business_type, company)
                 return result
             # Generate Context
-            context = {'lang': 'en_US', 'tz': False, 'uid': 2, 'allowed_company_ids': [15, 15, 1, 1, 14, 14, 16, 17, 18, 19, 19], 'active_id': real_id.id, 'active_ids': real_id.ids, 'active_model': model.model, 'mail_notify_force_send': False}
+            context = {'lang': 'en_US', 'tz': False, 'uid': 2, 'allowed_company_ids': [15, 15, 1, 1, 14, 14, 16, 17, 18, 19, 19, 20], 'active_id': real_id.id, 'active_ids': real_id.ids, 'active_model': model.model, 'mail_notify_force_send': False}
             try:
                 action_server.sudo().with_context(context).run()
             except Exception:
