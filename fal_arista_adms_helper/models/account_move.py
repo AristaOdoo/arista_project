@@ -222,3 +222,9 @@ class AccountMove(models.Model):
             ('asset_id.active', '=', True)
         ])
         records.post()
+
+
+class AccountMoveLine(models.Model):
+    _inherit = 'account.move.line'
+
+    ref = fields.Char(copy=True)
