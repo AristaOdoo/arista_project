@@ -3,6 +3,7 @@ from odoo import api, fields, models, SUPERUSER_ID, _
 from odoo.exceptions import UserError
 from num2words import num2words
 from odoo.tools import float_is_zero, float_compare, safe_eval, date_utils, email_split, email_escape_char, email_re
+from dateutil.relativedelta import relativedelta
 
 
 class AccountMove(models.Model):
@@ -212,6 +213,23 @@ class AccountMove(models.Model):
 
     @api.model
     def _autopost_draft_entries(self):
+        '''
+            Change Odoo standard, as Odoo will try to auto post entries with asset that is archived
+        '''
+        now_in_wib = (fields.Datetime.now() + relativedelta(hours=7))
+        date = int(now_in_wib.strftime('%d'))
+        hour = int(now_in_wib.strftime('%H'))
+        if date in [7, 8] and hour in [0, 1, 2, 3, 4, 5, 6, 7]:
+            records = self.search([
+                ('state', '=', 'draft'),
+                ('date', '<=', fields.Date.today()),
+                ('auto_post', '=', True),
+                ('asset_id.active', '=', True)
+            ], limit=500)
+            records.post()
+
+    @api.model
+    def _autopost_draft_entries_no_limit(self):
         '''
             Change Odoo standard, as Odoo will try to auto post entries with asset that is archived
         '''
