@@ -280,6 +280,15 @@ class IrActionsServer(models.Model):
                         if spk_pay.x_studio_paymtype in ['1', '2']:
                             total_dp += spk_pay.x_studio_amount
                         total_pay += spk_pay.x_studio_amount
+                    # Find Payment via customer invoice register payment model
+                    if real_id.invoice_ids:
+                        fmpwm_list = self.env['fal.multi.payment.wizard.model'].sudo().search([('invoice_ids', 'in', real_id.invoice_ids.ids)])
+                        for fmpwm in fmpwm_list:
+                            if fmpwm.register_payments_id.state == 'post':
+                                if fmpwm.payment_type == 'inbound':
+                                    total_pay += fmpwm.amount
+                                elif fmpwm.payment_type == 'outbound':
+                                    total_pay -= fmpwm.amount
                     result['total_dp'] = total_dp
                     result['total_pay'] = total_pay
                 return result
