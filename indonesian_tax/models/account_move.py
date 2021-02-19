@@ -6,7 +6,7 @@ from odoo.exceptions import ValidationError
 class AccountMove(models.Model):
     _inherit = 'account.move'
 
-    npwp = fields.Char(string='NPWP', size=15)
+    npwp = fields.Char(string='NPWP', size=25)
     ppkp = fields.Char(string='PPKP')
     nomor_faktur_pajak = fields.Char(string='Nomor Faktur Pajak', size=16, copy=False)
     faktur_pajak_id = fields.Many2one('faktur.pajak', string='Faktur Pajak', copy=False)
