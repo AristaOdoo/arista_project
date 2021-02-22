@@ -4,7 +4,7 @@ from odoo import models, fields
 class ResPartner(models.Model):
     _inherit = 'res.partner'
 
-    npwp = fields.Char(string='No. NPWP', size=15)
+    npwp = fields.Char(string='No. NPWP', size=25)
     pkp_status = fields.Selection([
         ('pkp', 'PKP'),
         ('nonpkp', 'Non PKP')],

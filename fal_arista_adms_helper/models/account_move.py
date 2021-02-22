@@ -31,11 +31,13 @@ class AccountMove(models.Model):
             #     continue
             for move_line in move.line_ids:
                 # On Arista no need to check if value is 0
+                # And check if move line is debit, otherwise it's selling asset and should not create asset
                 if (
                     move_line.account_id
                     and (move_line.account_id.can_create_asset)
                     and move_line.account_id.create_asset != "no"
                     and not move.reversed_entry_id
+                    and move_line.debit > 0
                 ):
                     if not move_line.name:
                         raise UserError(_('Journal Items of {account} should have a label in order to generate an asset').format(account=move_line.account_id.display_name))
@@ -224,7 +226,8 @@ class AccountMove(models.Model):
                 ('state', '=', 'draft'),
                 ('date', '<=', fields.Date.today()),
                 ('auto_post', '=', True),
-                ('asset_id.active', '=', True)
+                ('asset_id.active', '=', True),
+                ('asset_id.state', 'in', ['open', 'paused', 'close']),
             ], limit=500)
             records.post()
 
@@ -237,9 +240,24 @@ class AccountMove(models.Model):
             ('state', '=', 'draft'),
             ('date', '<=', fields.Date.today()),
             ('auto_post', '=', True),
-            ('asset_id.active', '=', True)
+            ('asset_id.active', '=', True),
+            ('asset_id.state', 'in', ['open', 'paused', 'close']),
         ])
         records.post()
+
+    def _depreciate(self):
+        for move in self.filtered(lambda m: m.asset_id):
+            asset = move.asset_id
+            if asset.state in ('open', 'paused'):
+                asset.value_residual -= abs(sum(move.line_ids.filtered(lambda l: l.account_id == asset.account_depreciation_id).mapped('balance')))
+                if asset.value_residual < 0:
+                    asset.value_residual = 0
+            elif asset.state == 'close':
+                asset.value_residual -= abs(sum(move.line_ids.filtered(lambda l: l.account_id != asset.account_depreciation_id).mapped('balance')))
+                if asset.value_residual < 0:
+                    asset.value_residual = 0
+            else:
+                raise UserError(_('You cannot post a depreciation on an asset in this state: %s') % dict(self.env['account.asset']._fields['state'].selection)[asset.state])
 
 
 class AccountMoveLine(models.Model):
