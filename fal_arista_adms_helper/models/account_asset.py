@@ -70,7 +70,7 @@ class AccountAsset(models.Model):
         move_ids = []
         assert len(self) == len(invoice_line_ids)
         for asset, invoice_line_id in zip(self, invoice_line_ids):
-            if disposal_date < max(asset.depreciation_move_ids.filtered(lambda x: not x.reversal_move_id and x.state == 'posted').mapped('date') or [fields.Date.today()]):
+            if disposal_date < max(asset.depreciation_move_ids.filtered(lambda x: not x.reversal_move_id and x.state == 'posted').mapped('date') or [disposal_date]):
                 if invoice_line_id:
                     raise UserError('There are depreciation posted after the invoice date (%s).\nPlease revert them or change the date of the invoice.' % disposal_date)
                 else:
