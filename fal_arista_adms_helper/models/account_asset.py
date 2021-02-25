@@ -48,7 +48,7 @@ class AccountAsset(models.Model):
     @api.depends('depreciation_move_ids.state')
     def _compute_accumulated_value(self):
         for record in self:
-            record.accumulated_value = sum(record.depreciation_move_ids.filtered(lambda x: x.state == 'posted').mapped('amount_total'))
+            record.accumulated_value = min(sum(record.depreciation_move_ids.filtered(lambda x: x.state == 'posted').mapped('amount_total')), record.original_value - record.salvage_value)
 
     def manual_compute_accumulated_value(self):
         for record in self:
