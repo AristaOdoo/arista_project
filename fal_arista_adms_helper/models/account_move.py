@@ -221,7 +221,10 @@ class AccountMove(models.Model):
         now_in_wib = (fields.Datetime.now() + relativedelta(hours=7))
         date = int(now_in_wib.strftime('%d'))
         hour = int(now_in_wib.strftime('%H'))
-        if date in [7, 8] and hour in [0, 1, 2, 3, 4, 5, 6, 7]:
+        possible_date = [7, 8]
+        if self._context.get('date'):
+            possible_date = self._context.get('date')
+        if date in possible_date and hour in [0, 1, 2, 3, 4, 5, 6, 7]:
             records = self.search([
                 ('state', '=', 'draft'),
                 ('date', '<=', fields.Date.today()),
@@ -230,6 +233,16 @@ class AccountMove(models.Model):
                 ('asset_id.state', 'in', ['open', 'paused', 'close']),
             ], limit=500)
             records.post()
+            self.env['ir.logging'].sudo().create({
+                'name': 'AutoPost',
+                'type': 'server',
+                'level': 'INFO',
+                'dbname': self.env.cr.dbname,
+                'message': str(records.ids),
+                'func': 'auto_post',
+                'path': 'path',
+                'line': 1,
+            })
 
     @api.model
     def _autopost_draft_entries_no_limit(self):
