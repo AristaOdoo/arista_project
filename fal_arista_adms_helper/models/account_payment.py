@@ -116,9 +116,9 @@ class AccountPayment(models.Model):
             # ==== 'inbound' / 'outbound' ====
             per_line_dmsrefnum = '/'
             if payment.partner_type == 'customer':
-                per_line_dmsrefnum = payment.invoice_ids[0] and payment.invoice_ids[0].invoice_origin
+                per_line_dmsrefnum = payment.invoice_ids[0] and payment.invoice_ids[0].x_studio_dmsrefnumber or payment.invoice_ids[0].invoice_origin
             elif payment.partner_type == 'supplier':
-                per_line_dmsrefnum = payment.invoice_ids[0] and payment.invoice_ids[0].name
+                per_line_dmsrefnum = payment.invoice_ids[0] and payment.invoice_ids[0].x_studio_dmsrefnumber or payment.invoice_ids[0].name
             move_vals = {
                 'date': payment.payment_date,
                 'ref': payment.communication,
