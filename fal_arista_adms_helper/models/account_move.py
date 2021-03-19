@@ -270,6 +270,10 @@ class AccountMove(models.Model):
             else:
                 raise UserError(_('You cannot post a depreciation on an asset in this state: %s') % dict(self.env['account.asset']._fields['state'].selection)[asset.state])
 
+    @api.constrains('ref', 'type', 'partner_id', 'journal_id', 'invoice_date')
+    def _check_duplicate_supplier_reference(self):
+        return
+
 
 class AccountMoveLine(models.Model):
     _inherit = 'account.move.line'
